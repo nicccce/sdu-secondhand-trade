@@ -1,2 +1,3 @@
 ﻿.idea
-/upload/
+/upload/*
+!/upload/.gitignore
