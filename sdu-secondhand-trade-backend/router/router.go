@@ -28,14 +28,21 @@ func Setup(engine *gin.Engine) {
 	}
 
 	// 用户
-	user := engine.Group("/users")
+	user := engine.Group("/user")
 	{
-		hub := service.UserService{}
-		user.GET("/test_get_jwt", hub.TestGetJWT)
-		user.POST("/login", hub.Login)
-		user.POST("/register", hub.Register)
+		service := service.UserService{}
+		user.GET("/test_get_jwt", service.TestGetJWT)
+		user.POST("/login", service.Login)
+		user.POST("/register", service.Register)
 	}
 	user.Use(middleware.JWT(1))
 	{
+		service := service.UserService{}
+		user.GET("/me", service.Me)
+	}
+	user.Use(middleware.JWT(2))
+	{
+		service := service.UserService{}
+		user.GET("/:id", service.GetUser)
 	}
 }

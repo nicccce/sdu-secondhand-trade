@@ -1,37 +1,40 @@
 package model
 
 import (
+	"errors"
 	"gorm.io/gorm"
 	"sdu-secondhand-trade-backend/util"
 	"time"
 )
 
 type User struct {
-	ID       int    `json:"id"`
-	RoleID   int    `json:"role_id"`
-	Password string `json:"password"`
+	ID        int    `json:"id"`
+	RoleID    int    `json:"role_id"`
+	Password  string `json:"password"`
+	StudentID string `json:"student_id"`
 	UserInfo
 }
 type UserInfo struct {
-	UserName  string    `json:"username" form:"username" binding:"required"`
-	StudentID string    `json:"sid" form:"sid" binding:"required"`
-	Qq        string    `json:"qq" form:"qq" binding:"required"`
-	Info      string    `json:"info" form:"info" binding:"required"`
-	CreatedAt time.Time `json:"created_at" binging:"-"`
+	Nickname     string    `json:"nickname"`
+	IconUrl      string    `json:"icon_url"`
+	Phone        string    `json:"phone"`
+	Alipay       string    `json:"alipay"`
+	Introduction string    `json:"introduction"`
+	Campus       string    `json:"campus"`
+	CreatedAt    time.Time `json:"created_at" binging:"-"`
 }
 
 type UserModel struct {
 	AbstractModel
 }
 
-func (receiver UserModel) FindUserByID(id int) *User {
+func (receiver UserModel) FindUserByID(id int) (*User, error) {
 	var user User
 	err := receiver.Tx.Take(&user, id).Error
-	if err == gorm.ErrRecordNotFound {
-		return nil
+	if errors.Is(gorm.ErrRecordNotFound, err) {
+		return nil, nil
 	}
-	util.ForwardOrPanic(err)
-	return &user
+	return &user, err
 }
 func (receiver UserModel) UpdateUser(user *User) {
 	err := receiver.Tx.Save(user).Error

@@ -7,13 +7,15 @@ import (
 	"sdu-secondhand-trade-backend/conf"
 	"sdu-secondhand-trade-backend/model"
 	"sdu-secondhand-trade-backend/util"
+	"strconv"
 )
 
 type UserService struct {
 }
 type UserVO struct {
-	ID     int `json:"id"`
-	RoleID int `json:"role_id"`
+	ID        int    `json:"id"`
+	RoleID    int    `json:"role_id"`
+	StudentID string `json:"student_id"`
 	model.UserInfo
 	Token *string `json:"token,omitempty"`
 }
@@ -33,7 +35,11 @@ func (receiver UserService) TestGetJWT(c *gin.Context) {
 		aw.Error("jwtSecret不正确")
 		return
 	}
-	user := userModel.FindUserByID(req.UserID)
+	user, err := userModel.FindUserByID(req.UserID)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
 	if user == nil {
 		aw.Error("userID不存在")
 		return
@@ -43,7 +49,7 @@ func (receiver UserService) TestGetJWT(c *gin.Context) {
 func (receiver UserService) Login(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	type loginReq struct {
-		StudentID string `form:"sid" json:"sid" binding:"required"`
+		StudentID string `form:"student_id" json:"student_id" binding:"required"`
 		Password  string `form:"password" json:"password" binding:"required"`
 	}
 	var req loginReq
@@ -62,18 +68,20 @@ func (receiver UserService) Login(c *gin.Context) {
 	}
 	token := util.GenerateJWT(user.ID, user.RoleID)
 	userVO := UserVO{
-		ID:       user.ID,
-		RoleID:   user.RoleID,
-		UserInfo: user.UserInfo,
-		Token:    &token,
+		ID:        user.ID,
+		RoleID:    user.RoleID,
+		StudentID: user.StudentID,
+		UserInfo:  user.UserInfo,
+		Token:     &token,
 	}
 	aw.Success(userVO)
 }
 func (receiver UserService) Register(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	type registerReq struct {
-		Password string `form:"password" json:"password" binding:"required"`
-		model.UserInfo
+		Password  string `form:"password" json:"password" binding:"required"`
+		StudentID string `form:"student_id" json:"student_id" binding:"required"`
+		Nickname  string `form:"nickname" json:"nickname" binding:"required"`
 	}
 	var req registerReq
 	if err := c.ShouldBind(&req); err != nil {
@@ -81,8 +89,8 @@ func (receiver UserService) Register(c *gin.Context) {
 		return
 	}
 	pattern := `^202\d{9}$`
-	rgxp := regexp.MustCompile(pattern)
-	if !rgxp.MatchString(req.StudentID) {
+	regexp := regexp.MustCompile(pattern)
+	if !regexp.MatchString(req.StudentID) {
 		aw.Error("学号不合法")
 		return
 	}
@@ -97,10 +105,45 @@ func (receiver UserService) Register(c *gin.Context) {
 		return
 	}
 	user = &model.User{
-		RoleID:   1,
-		Password: encryptPassword,
-		UserInfo: req.UserInfo,
+		RoleID:    1,
+		Password:  encryptPassword,
+		StudentID: req.StudentID,
+		UserInfo: model.UserInfo{
+			Nickname: req.Nickname,
+		},
 	}
 	userModel.CreateUser(user)
 	aw.OK()
+}
+func (receiver UserService) Me(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	userClaims := util.ExtractUserClaims(c)
+	user, err := receiver.getUserInfo(userClaims.UserID)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	aw.Success(user)
+}
+func (receiver UserService) GetUser(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	userID, err := strconv.Atoi(c.Param("id"))
+	user, err := receiver.getUserInfo(userID)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	aw.Success(user)
+}
+func (receiver UserService) getUserInfo(id int) (UserVO, error) {
+	user, err := userModel.FindUserByID(id)
+	if err != nil {
+		return UserVO{}, err
+	}
+	return UserVO{
+		ID:        user.ID,
+		RoleID:    user.RoleID,
+		StudentID: user.StudentID,
+		UserInfo:  user.UserInfo,
+	}, nil
 }

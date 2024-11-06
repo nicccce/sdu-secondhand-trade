@@ -50,5 +50,8 @@ func Database_initialization() error {
 	if err := DB.AutoMigrate(&User{}); err != nil {
 		return err
 	}
+	if err := DB.AutoMigrate(&Address{}); err != nil {
+		return err
+	}
 	return nil
 }

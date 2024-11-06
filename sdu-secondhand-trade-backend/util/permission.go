@@ -49,18 +49,3 @@ func ExtractUserClaims(c *gin.Context) *UserClaims {
 	}
 	return userClaims
 }
-func ExtractSectionID(c *gin.Context) int {
-	sectionID, ok := c.Get("sectionID")
-	if !ok {
-		panic("sectionID must exists")
-	}
-	sectionIDi, ok := sectionID.(int)
-	if !ok {
-		panic("sectionID cannot be converted")
-	}
-	return sectionIDi
-}
-func HasSectionID(c *gin.Context) bool {
-	_, ok := c.Get("sectionID")
-	return ok
-}
