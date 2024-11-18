@@ -1,1 +1,2 @@
 # This ensures the upload directory is tracked but its contents are ignored.
+node_modules/*
