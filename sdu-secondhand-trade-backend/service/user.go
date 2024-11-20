@@ -147,3 +147,57 @@ func (receiver UserService) getUserInfo(id int) (UserVO, error) {
 		UserInfo:  user.UserInfo,
 	}, nil
 }
+
+func (receiver UserService) GetAllUser(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	users := userModel.FindAllUsers()
+
+	// 将 users 转换为 gin.H 格式
+	var userList []gin.H
+	for _, user := range users {
+		userData := gin.H{
+			"id":         user.ID,
+			"nickname":   user.UserInfo.Nickname,
+			"student_id": user.StudentID,
+			"role_id":    user.RoleID,
+		}
+		userList = append(userList, userData)
+	}
+
+	aw.Success(userList)
+}
+
+func (receiver UserService) UpdatePassword(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	type updateReq struct {
+		oldPassword string `json:"old_password" binding:"required"`
+		newPassword string `json:"new_password" binding:"required"`
+		StudentID   string `json:"student_id" binding:"required"`
+	}
+	var req updateReq
+	if err := c.ShouldBind(&req); err != nil {
+		aw.Error(err.Error())
+	}
+	user := userModel.FindUserByStudentID(req.StudentID)
+	if user == nil {
+		aw.Error("用户名不存在")
+		return
+	}
+	if !util.CheckPassword(req.oldPassword, user.Password) {
+		aw.Error("旧密码错误")
+		return
+	}
+	encryptPassword, err := util.EncryptPassword(req.newPassword)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	user = &model.User{
+		RoleID:    user.RoleID,
+		Password:  encryptPassword,
+		StudentID: user.StudentID,
+		UserInfo:  user.UserInfo,
+	}
+	userModel.UpdateUser(user)
+	aw.OK()
+}
