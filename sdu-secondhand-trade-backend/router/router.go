@@ -39,10 +39,13 @@ func Setup(engine *gin.Engine) {
 	{
 		service := service.UserService{}
 		user.GET("/me", service.Me)
+		user.POST("/password", service.UpdatePassword)
 	}
 	user.Use(middleware.JWT(2))
 	{
 		service := service.UserService{}
 		user.GET("/:id", service.GetUser)
+		user.GET("/", service.GetAllUser)
+		user.POST("/password", service.UpdatePassword)
 	}
 }
