@@ -33,3 +33,13 @@ npm run build
 ```sh
 npm run lint
 ```
+
+### Dependency
+
+setup element-plus
+
+```sh
+npm install element-plus --save
+
+npm install -D unplugin-vue-components unplugin-auto-import
+```

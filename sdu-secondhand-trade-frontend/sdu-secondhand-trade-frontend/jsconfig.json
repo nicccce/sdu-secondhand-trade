@@ -1,4 +1,5 @@
 {
+  /* 做联想路径提取 */
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
