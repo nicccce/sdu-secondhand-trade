@@ -17,7 +17,8 @@ type UserVO struct {
 	RoleID    int    `json:"role_id"`
 	StudentID string `json:"student_id"`
 	model.UserInfo
-	Token *string `json:"token,omitempty"`
+	Token     *string         `json:"token,omitempty"`
+	Addresses []model.Address `json:"addresses,omitempty"`
 }
 
 func (receiver UserService) TestGetJWT(c *gin.Context) {
@@ -67,12 +68,15 @@ func (receiver UserService) Login(c *gin.Context) {
 		return
 	}
 	token := util.GenerateJWT(user.ID, user.RoleID)
+	addresses := addressModel.FindAddressesByUserID(user.ID)
+
 	userVO := UserVO{
 		ID:        user.ID,
 		RoleID:    user.RoleID,
 		StudentID: user.StudentID,
 		UserInfo:  user.UserInfo,
 		Token:     &token,
+		Addresses: addresses,
 	}
 	aw.Success(userVO)
 }
@@ -140,11 +144,13 @@ func (receiver UserService) getUserInfo(id int) (UserVO, error) {
 	if err != nil {
 		return UserVO{}, err
 	}
+	addresses := addressModel.FindAddressesByUserID(user.ID)
 	return UserVO{
 		ID:        user.ID,
 		RoleID:    user.RoleID,
 		StudentID: user.StudentID,
 		UserInfo:  user.UserInfo,
+		Addresses: addresses,
 	}, nil
 }
 
@@ -169,16 +175,20 @@ func (receiver UserService) GetAllUser(c *gin.Context) {
 
 func (receiver UserService) UpdatePassword(c *gin.Context) {
 	aw := app.NewWrapper(c)
+	userClaim := util.ExtractUserClaims(c)
 	type updateReq struct {
 		oldPassword string `json:"old_password" binding:"required"`
 		newPassword string `json:"new_password" binding:"required"`
-		StudentID   string `json:"student_id" binding:"required"`
 	}
 	var req updateReq
 	if err := c.ShouldBind(&req); err != nil {
 		aw.Error(err.Error())
 	}
-	user := userModel.FindUserByStudentID(req.StudentID)
+	user, err := userModel.FindUserByID(userClaim.UserID)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
 	if user == nil {
 		aw.Error("用户名不存在")
 		return
@@ -197,6 +207,113 @@ func (receiver UserService) UpdatePassword(c *gin.Context) {
 		Password:  encryptPassword,
 		StudentID: user.StudentID,
 		UserInfo:  user.UserInfo,
+	}
+	userModel.UpdateUser(user)
+	aw.OK()
+}
+func (receiver UserService) CreateAddress(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	userClaim := util.ExtractUserClaims(c)
+	type updateReq struct {
+		address string `form:"address" json:"address" binding:"required"`
+	}
+	var req updateReq
+	if err := c.ShouldBind(&req); err != nil {
+		aw.Error(err.Error())
+	}
+	user, err := userModel.FindUserByID(userClaim.UserID)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	if user == nil {
+		aw.Error("用户名不存在")
+		return
+	}
+	address := req.address
+	newAddress := &model.Address{
+		Address: address,
+		UserID:  userClaim.UserID,
+	}
+	addressModel.CreateAddress(newAddress)
+	aw.OK()
+}
+
+func (receiver UserService) UpdateAddress(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	userClaim := util.ExtractUserClaims(c)
+	type updateReq struct {
+		address string `form:"address" json:"address" binding:"required"`
+	}
+	var req updateReq
+	if err := c.ShouldBind(&req); err != nil {
+		aw.Error(err.Error())
+	}
+	id, err := strconv.Atoi(c.Param("id"))
+	address, err := addressModel.FindAddressesByID(id)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	if address == nil {
+		aw.Error("地址不存在")
+		return
+	}
+	address = &model.Address{
+		Address: req.address,
+		UserID:  userClaim.UserID,
+	}
+	addressModel.UpdateAddress(address)
+	aw.OK()
+}
+
+func (receiver UserService) DeleteAddress(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	type updateReq struct {
+		address string `form:"address" json:"address" binding:"required"`
+	}
+	var req updateReq
+	if err := c.ShouldBind(&req); err != nil {
+		aw.Error(err.Error())
+	}
+	id, err := strconv.Atoi(c.Param("id"))
+	address, err := addressModel.FindAddressesByID(id)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	if address == nil {
+		aw.Error("地址不存在")
+		return
+	}
+	addressModel.DeleteAddress(id)
+	aw.OK()
+}
+
+func (receiver UserService) UpdateUser(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	userClaim := util.ExtractUserClaims(c)
+	type updateReq struct {
+		model.UserInfo
+	}
+	var req updateReq
+	if err := c.ShouldBind(&req); err != nil {
+		aw.Error(err.Error())
+	}
+	user, err := userModel.FindUserByID(userClaim.UserID)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	if user == nil {
+		aw.Error("用户名不存在")
+		return
+	}
+	user = &model.User{
+		RoleID:    user.RoleID,
+		Password:  user.Password,
+		StudentID: user.StudentID,
+		UserInfo:  req.UserInfo,
 	}
 	userModel.UpdateUser(user)
 	aw.OK()
