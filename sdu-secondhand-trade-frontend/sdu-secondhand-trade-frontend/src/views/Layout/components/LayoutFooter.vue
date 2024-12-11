@@ -51,6 +51,9 @@
   
   <style scoped lang='scss'>
   .app_footer {
+    width: 100vw;
+    box-sizing: border-box;
+    margin: 0;
     overflow: hidden;
     background-color: #f5f5f5;
     padding-top: 20px;
@@ -61,6 +64,8 @@
       .container {
         padding: 60px 0 40px 25px;
         display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
       }
   
       dl {
