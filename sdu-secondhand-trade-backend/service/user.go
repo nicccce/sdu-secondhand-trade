@@ -203,6 +203,7 @@ func (receiver UserService) UpdatePassword(c *gin.Context) {
 		return
 	}
 	user = &model.User{
+		ID:        user.ID,
 		RoleID:    user.RoleID,
 		Password:  encryptPassword,
 		StudentID: user.StudentID,
@@ -215,24 +216,15 @@ func (receiver UserService) CreateAddress(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	userClaim := util.ExtractUserClaims(c)
 	type updateReq struct {
-		address string `form:"address" json:"address" binding:"required"`
+		Address string `json:"address" binding:"required"`
 	}
 	var req updateReq
 	if err := c.ShouldBind(&req); err != nil {
 		aw.Error(err.Error())
-	}
-	user, err := userModel.FindUserByID(userClaim.UserID)
-	if err != nil {
-		aw.Error(err.Error())
 		return
 	}
-	if user == nil {
-		aw.Error("用户名不存在")
-		return
-	}
-	address := req.address
 	newAddress := &model.Address{
-		Address: address,
+		Address: req.Address,
 		UserID:  userClaim.UserID,
 	}
 	addressModel.CreateAddress(newAddress)
@@ -243,11 +235,12 @@ func (receiver UserService) UpdateAddress(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	userClaim := util.ExtractUserClaims(c)
 	type updateReq struct {
-		address string `form:"address" json:"address" binding:"required"`
+		Address string `json:"address" binding:"required"`
 	}
 	var req updateReq
 	if err := c.ShouldBind(&req); err != nil {
 		aw.Error(err.Error())
+		return
 	}
 	id, err := strconv.Atoi(c.Param("id"))
 	address, err := addressModel.FindAddressesByID(id)
@@ -259,8 +252,13 @@ func (receiver UserService) UpdateAddress(c *gin.Context) {
 		aw.Error("地址不存在")
 		return
 	}
+	if userClaim.RoleID <= 1 && address.UserID != userClaim.UserID {
+		aw.Error("无更新权限")
+		return
+	}
 	address = &model.Address{
-		Address: req.address,
+		ID:      id,
+		Address: req.Address,
 		UserID:  userClaim.UserID,
 	}
 	addressModel.UpdateAddress(address)
@@ -275,8 +273,10 @@ func (receiver UserService) DeleteAddress(c *gin.Context) {
 	var req updateReq
 	if err := c.ShouldBind(&req); err != nil {
 		aw.Error(err.Error())
+		return
 	}
 	id, err := strconv.Atoi(c.Param("id"))
+	userClaim := util.ExtractUserClaims(c)
 	address, err := addressModel.FindAddressesByID(id)
 	if err != nil {
 		aw.Error(err.Error())
@@ -284,6 +284,10 @@ func (receiver UserService) DeleteAddress(c *gin.Context) {
 	}
 	if address == nil {
 		aw.Error("地址不存在")
+		return
+	}
+	if userClaim.RoleID <= 1 && address.UserID != userClaim.UserID {
+		aw.Error("无删除权限")
 		return
 	}
 	addressModel.DeleteAddress(id)
@@ -299,6 +303,7 @@ func (receiver UserService) UpdateUser(c *gin.Context) {
 	var req updateReq
 	if err := c.ShouldBind(&req); err != nil {
 		aw.Error(err.Error())
+		return
 	}
 	user, err := userModel.FindUserByID(userClaim.UserID)
 	if err != nil {
@@ -309,12 +314,8 @@ func (receiver UserService) UpdateUser(c *gin.Context) {
 		aw.Error("用户名不存在")
 		return
 	}
-	user = &model.User{
-		RoleID:    user.RoleID,
-		Password:  user.Password,
-		StudentID: user.StudentID,
-		UserInfo:  req.UserInfo,
-	}
+	req.CreatedAt = user.CreatedAt
+	user.UserInfo = req.UserInfo
 	userModel.UpdateUser(user)
 	aw.OK()
 }

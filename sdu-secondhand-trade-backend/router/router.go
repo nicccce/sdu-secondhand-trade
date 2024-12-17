@@ -29,7 +29,6 @@ func Setup(engine *gin.Engine) {
 
 	// 用户
 	user := engine.Group("/user")
-	address := user.Group("/address")
 	{
 		service := service.UserService{}
 		user.GET("/test_get_jwt", service.TestGetJWT)
@@ -39,20 +38,20 @@ func Setup(engine *gin.Engine) {
 	user.Use(middleware.JWT(1))
 	{
 		service := service.UserService{}
-		user.GET("/me", service.Me)
 		user.POST("/password", service.UpdatePassword)
 		user.POST("/me", service.UpdateUser)
-		address.POST("/", service.CreateAddress)
-		address.POST("/:id", service.UpdateAddress)
-		address.DELETE("/:id", service.DeleteAddress)
+		user.GET("/me", service.Me)
 	}
 	user.Use(middleware.JWT(2))
 	{
 		service := service.UserService{}
 		user.GET("/:id", service.GetUser)
 		user.GET("/", service.GetAllUser)
-		user.POST("/password", service.UpdatePassword)
-		user.POST("/me", service.UpdateUser)
+	}
+	address := engine.Group("/user/address")
+	address.Use(middleware.JWT(1))
+	{
+		service := service.UserService{}
 		address.POST("/", service.CreateAddress)
 		address.POST("/:id", service.UpdateAddress)
 		address.DELETE("/:id", service.DeleteAddress)
