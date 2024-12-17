@@ -319,3 +319,15 @@ func (receiver UserService) UpdateUser(c *gin.Context) {
 	userModel.UpdateUser(user)
 	aw.OK()
 }
+
+func (receiver UserService) GetAllGender(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	users := userModel.GetAllUserGenders()
+	aw.Success(users)
+}
+
+func (receiver UserService) GetAllCampus(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	users := userModel.GetAllUserCampus()
+	aw.Success(users)
+}

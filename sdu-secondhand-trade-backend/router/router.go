@@ -56,4 +56,12 @@ func Setup(engine *gin.Engine) {
 		address.POST("/:id", service.UpdateAddress)
 		address.DELETE("/:id", service.DeleteAddress)
 	}
+
+	static := engine.Group("/static")
+	static.Use(middleware.JWT(1))
+	{
+		service := service.UserService{}
+		static.GET("/gender", service.GetAllGender)
+		static.GET("/campus", service.GetAllCampus)
+	}
 }
