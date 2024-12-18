@@ -22,6 +22,7 @@ type UserInfo struct {
 	Introduction string    `json:"introduction"`
 	Campus       string    `json:"campus"`
 	CreatedAt    time.Time `json:"created_at" binging:"-"`
+	Gender       string    `json:"gender"`
 }
 
 type UserModel struct {
@@ -62,4 +63,17 @@ func (receiver UserModel) FindUserByStudentID(studentID string) *User {
 	}
 	util.ForwardOrPanic(err)
 	return &user
+}
+
+func (receiver UserModel) GetAllUserGenders() []map[string]interface{} {
+	var results []map[string]interface{}
+	err := receiver.Tx.Model(&User{}).Select("gender, id").Find(&results).Error
+	util.ForwardOrPanic(err)
+	return results
+}
+func (receiver UserModel) GetAllUserCampus() []map[string]interface{} {
+	var results []map[string]interface{}
+	err := receiver.Tx.Model(&User{}).Select("id, campus").Find(&results).Error
+	util.ForwardOrPanic(err)
+	return results
 }
