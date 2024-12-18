@@ -1,7 +1,8 @@
 <script setup>
 import { useCategoryStore } from '@/stores/category';
-
+import { useStaticStore } from '@/stores/static';
 const categoryStore = useCategoryStore()
+const staticStore = useStaticStore()
 </script>
 
 <template>
@@ -10,19 +11,23 @@ const categoryStore = useCategoryStore()
       <li v-for="item in categoryStore.categoryList" :key="item.id">
         <RouterLink to="/">{{ item.name }}</RouterLink>
         <RouterLink to="/">{{ item.introduction }}</RouterLink>
-        <!-- 弹层layer位置 -->
         <div class="layer">
           <h4>分类推荐 <small>根据您的购买或浏览记录推荐</small></h4>
           <ul>
-            <li v-for="good in item.goods" :key="good.id">
+            <li v-for="good in item.goods.slice(0, 16)" :key="good.id">
               <RouterLink to="/">
-                <img :src="good.cover" />
+                <img class="icon" v-img-lazy="good.cover" />
                 <div class="info">
                   <p class="name ellipsis-2">
                     {{ good.name }}
                   </p>
                   <p class="desc ellipsis">{{ good.description }}</p>
-                  <p class="price"><i>¥</i>{{ good.price }}</p>
+                  <div class="price-tag">
+                    <p class="price"><i>¥</i>{{ good.price }}</p>
+                    <el-tag type="primary">
+                      {{ (staticStore.campusList.find(campus => campus.id === good.campus)||{name : '校外'}).name }}
+                    </el-tag>
+                  </div>
                 </div>
               </RouterLink>
             </li>
@@ -34,10 +39,11 @@ const categoryStore = useCategoryStore()
 </template>
 
 
+
 <style scoped lang='scss'>
 .home-category {
   width: 300px;
-  height: 600px;
+  height: 610px;
   background: rgba(0, 0, 0, 0.8);
   position: relative;
   z-index: 99;
@@ -49,7 +55,7 @@ const categoryStore = useCategoryStore()
       line-height: 55px;
 
       &:hover {
-        background: $mainColor;
+        background: $lightColor;
       }
 
       a {
@@ -62,8 +68,8 @@ const categoryStore = useCategoryStore()
       }
 
       .layer {
-        width: 1300px;
-        height: 600px;
+        width: 1400px;
+        height: 610px;
         background: rgba(255, 255, 255, 0.8);
         position: absolute;
         left: 300px;
@@ -74,7 +80,7 @@ const categoryStore = useCategoryStore()
         h4 {
           font-size: 20px;
           font-weight: normal;
-          line-height: 80px;
+          line-height: 60px;
 
           small {
             font-size: 16px;
@@ -83,19 +89,20 @@ const categoryStore = useCategoryStore()
         }
 
         ul {
+          width: 100%;
           display: flex;
           flex-wrap: wrap;
 
           li {
             width: 310px;
             height: 120px;
-            margin-right: 15px;
+            margin-right: 20px;
             margin-bottom: 15px;
             border: 1px solid #eee;
             border-radius: 4px;
             background: #fff;
 
-            &:nth-child(3n) {
+            &:nth-child(4n) {
               margin-right: 0;
             }
 
@@ -107,7 +114,7 @@ const categoryStore = useCategoryStore()
               padding: 10px;
 
               &:hover {
-                background: #e3f9f4;
+                background: $bgLightColor;
               }
 
               img {
@@ -129,12 +136,25 @@ const categoryStore = useCategoryStore()
                   color: #999;
                 }
 
-                .price {
-                  font-size: 22px;
-                  color: $priceColor;
+                .price-tag {
+                  display: flex;
+                  align-items: center; // 垂直居中对齐
+                  justify-content: space-between;
+                  margin-top: 8px;
 
-                  i {
-                    font-size: 16px;
+                  .price {
+                    font-size: 22px;
+                    color: $priceColor;
+
+                    i {
+                      font-size: 16px;
+                    }
+                  }
+
+                  .el-tag {
+                    margin-left: 10px; // 为 tag 和价格之间提供间距
+                    font-size: 14px; // 调整 tag 的字体大小
+                    line-height: 1.5;
                   }
                 }
               }
@@ -143,7 +163,6 @@ const categoryStore = useCategoryStore()
         }
       }
 
-      // 关键样式  hover状态下的layer盒子变成block
       &:hover {
         .layer {
           display: block;

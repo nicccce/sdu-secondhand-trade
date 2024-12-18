@@ -94,7 +94,7 @@ const categoryStore = useCategoryStore()
     width: 250px;
     height: 40px;
     position: relative;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.6);
     border-radius: 20px;
     display: flex;
     align-items: center;
@@ -116,7 +116,6 @@ const categoryStore = useCategoryStore()
 
       &::placeholder {
         color: #474747;
-        /* 设置 placeholder 颜色为灰色 */
       }
     }
   }

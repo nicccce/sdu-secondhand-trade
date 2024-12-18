@@ -1,33 +1,25 @@
 <script setup>
 import HomePanel from './HomePanel.vue';
-import { getNewGoodsAPI } from '@/apis/home';
+import { getCampusGoodsAPI } from '@/apis/home';
 import { onMounted, ref } from 'vue';
-import { useStaticStore } from '@/stores/static';
 import { useCategoryStore } from '@/stores/category';
 
 const goodList = ref([]);
 
-const getNewGoods = async () => {
-    const res = await getNewGoodsAPI();
+const getCampusGoods = async () => {
+    const res = await getCampusGoodsAPI(1);
     goodList.value = res.data;
 };
-
-const staticStore = useStaticStore()
 const categoryStore = useCategoryStore()
 
-onMounted(() => getNewGoods());
-
-
+onMounted(() => getCampusGoods());
 </script>
 
 <template>
-  <HomePanel title="新鲜好物" sub-title="二手宝藏，物超所值">
+  <HomePanel title="校区甄选" sub-title="近享美物，触手可及">
     <ul class="goods-list">
       <li v-for="item in goodList.slice(0, 10)" :key="item.id">
         <RouterLink :to="`/`">
-          <el-tag type="primary" class="campus-tag">
-            {{ (staticStore.campusList.find(campus => campus.id === item.campus)||{name : '校外'}).name  }}
-          </el-tag>
           <el-tag type="success" class="category-tag">
             {{ (categoryStore.categoryList.find(category => category.id === item.category)||{name : '闲置'}).name }}
           </el-tag>
@@ -53,7 +45,7 @@ onMounted(() => getNewGoods());
     background: $bgLightColor;
     border-radius: 8px;
     overflow: hidden;
-    position: relative;
+    position: relative; // 添加相对定位，为 el-tag 提供定位参照
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 
     &:hover {
@@ -61,16 +53,10 @@ onMounted(() => getNewGoods());
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     }
 
-    .campus-tag {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      z-index: 10;
-    }
     .category-tag {
       position: absolute;
       top: 8px;
-      left: 70px;
+      left: 8px;
       z-index: 10;
     }
 

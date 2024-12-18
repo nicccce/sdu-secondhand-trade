@@ -6,7 +6,7 @@ export const getCategoryAPI = () => httpInstance({
 
 export const getCategoryGoodsAPI = (categoryName) => {
     return httpInstance({
-        url: `/good/category/${categoryName}`,
+        url: `/good/category/recommend/${categoryName}`,
         method: 'GET'
     })
 }

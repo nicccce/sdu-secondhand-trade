@@ -5,7 +5,7 @@ import { onMounted } from 'vue';
 
 const staticStore = useStaticStore()
 
-onMounted(()=>{
+onMounted(() => {
   staticStore.getCampusList()
   staticStore.getGenderList()
 })
@@ -15,6 +15,4 @@ onMounted(()=>{
   <RouterView />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -7,8 +7,9 @@ import { useCategoryStore } from '@/stores/category';
 import { onMounted } from 'vue';
 
 const categoryStore = useCategoryStore()
-
-onMounted(()=>categoryStore.getCategory())
+onMounted(() => {
+    categoryStore.getCategory()
+})
 </script>
 
 <template>
@@ -24,9 +25,9 @@ onMounted(()=>categoryStore.getCategory())
 <style scoped>
 .layout-container {
     width: 100vw;
-    max-width:100%;
+    max-width: 100%;
     min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 </style>

@@ -2,7 +2,7 @@
 import HomeCategory from './components/HomeCategory.vue'
 import HomeBanner from './components/HomeBanner.vue'
 import HomeNew from './components/HomeNew.vue'
-import HomeHot from './components/HomeHot.vue'
+import HomeCampus from './components/HomeCampus.vue'
 import homeProduct from './components/HomeProduct.vue'
 </script>
 
@@ -12,6 +12,5 @@ import homeProduct from './components/HomeProduct.vue'
     <HomeBanner />
   </div>
   <HomeNew />
-  <HomeHot />
-  <homeProduct />
+  <HomeCampus />
 </template>
