@@ -12,26 +12,32 @@ const categoryStore = useCategoryStore()
         <RouterLink to="/">淘山大</RouterLink>
       </h1>
       <ul class="app-header-nav">
-        <li class="home" v-for="item in categoryStore.categoryList" :key="item.id">
-          <RouterLink to="/">{{ item.name }}</RouterLink>
+        <li 
+          class="home" 
+          v-for="item in categoryStore.categoryList" 
+          :key="item.id"
+          :class="{ active: $route.path.includes(`/category/${item.id}`) }"
+        >
+          <RouterLink 
+            active-class="active"
+            :to="`/category/${item.id}`"
+          >
+            {{ item.name }}
+          </RouterLink>
         </li>
       </ul>
       <div class="search">
         <i class="iconfont icon-search"></i>
         <input type="text" placeholder="搜一搜">
       </div>
-      <!-- 头部购物车 -->
-
     </div>
   </header>
 </template>
-
 
 <style scoped lang='scss'>
 .app-header {
   background: $mainColor;
   height: 100px;
-
 
   .container {
     display: flex;
@@ -56,7 +62,6 @@ const categoryStore = useCategoryStore()
     }
   }
 
-
   .app-header-nav {
     width: auto;
     height: 100px;
@@ -69,11 +74,18 @@ const categoryStore = useCategoryStore()
       width: 100px;
       height: 100%;
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease; /* 平滑的背景颜色过渡 */
+
+      &.active {
+        background-color: $darkColor; /* 激活状态时的背景颜色 */
+      }
 
       &:hover {
         background-color: $darkColor;
       }
-
 
       a {
         font-size: 20px;
@@ -84,8 +96,7 @@ const categoryStore = useCategoryStore()
       }
 
       .active {
-        color: $mainColor;
-        border-bottom: 1px solid $mainColor;
+        background-color: $darkColor;
       }
     }
   }
@@ -119,7 +130,6 @@ const categoryStore = useCategoryStore()
       }
     }
   }
-
 
   .cart {
     width: 50px;

@@ -14,7 +14,7 @@ const staticStore = useStaticStore()
         <div class="layer">
           <h4>分类推荐 <small>根据您的购买或浏览记录推荐</small></h4>
           <ul>
-            <li v-for="good in item.goods.slice(0, 16)" :key="good.id">
+            <li v-for="good in (item.goods || []).slice(0, 16)" :key="good.id">
               <RouterLink to="/">
                 <img class="icon" v-img-lazy="good.cover" />
                 <div class="info">

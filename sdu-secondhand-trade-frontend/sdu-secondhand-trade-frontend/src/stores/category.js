@@ -20,6 +20,10 @@ export const useCategoryStore = defineStore('category', () => {
         for (let category of categoryList.value) {
                 const goodsRes = await getCategoryGoodsAPI(category.id)
                 category.goods = goodsRes.data || []
+                for(let child of category.children) {
+                    const childGoodsRes = await getCategoryGoodsAPI(child.id)
+                    child.goods=childGoodsRes.data
+                }
         }
     }
 
