@@ -1,4 +1,7 @@
 <script setup>
+import { useCategoryStore } from '@/stores/category';
+
+const categoryStore = useCategoryStore()
 
 </script>
 
@@ -9,19 +12,16 @@
         <RouterLink to="/">淘山大</RouterLink>
       </h1>
       <ul class="app-header-nav">
-        <li class="home">
-          <RouterLink to="/">首页</RouterLink>
+        <li class="home" v-for="item in categoryStore.categoryList" :key="item.id">
+          <RouterLink to="/">{{ item.name }}</RouterLink>
         </li>
-        <li> <RouterLink to="/">居家</RouterLink> </li>
-        <li> <RouterLink to="/">美食</RouterLink> </li>
-        <li> <RouterLink to="/">服饰</RouterLink> </li>
       </ul>
       <div class="search">
         <i class="iconfont icon-search"></i>
         <input type="text" placeholder="搜一搜">
       </div>
       <!-- 头部购物车 -->
-      
+
     </div>
   </header>
 </template>
@@ -32,15 +32,19 @@
   background: $mainColor;
   height: 100px;
 
-  
+
   .container {
     display: flex;
     align-items: center;
   }
 
   .logo {
+    margin-left: 20px;
+    height: 100px;
     width: 200px;
     padding-left: 40px;
+    display: flex;
+    justify-content: center;
 
     a {
       display: block;
@@ -48,60 +52,74 @@
       width: 100%;
       text-indent: -9999px;
       background: url('@/assets/images/logo.png') no-repeat center 18px / contain;
+      transform: scale(1.3) translateY(10px);
     }
   }
 
+
   .app-header-nav {
     width: auto;
-    height: 100%;
+    height: 100px;
     display: flex;
-    padding-left: 40px;
+    padding-left: 80px;
     position: relative;
-    z-index: 998;
     flex-grow: 1;
 
     li {
-      margin-right: 40px;
+      width: 100px;
       height: 100%;
       text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      
-      a {
-        font-size: 16px;
-        line-height: 32px;
-        height: 32px;
-        color: white;
-        display: inline-block;
+
+      &:hover {
+        background-color: $darkColor;
       }
-    
-      .active {
+
+
+      a {
+        font-size: 20px;
+        line-height: 100px;
+        height: 100px;
+        display: inline-block;
         color: white;
+      }
+
+      .active {
+        color: $mainColor;
         border-bottom: 1px solid $mainColor;
       }
     }
   }
 
-
   .search {
-    width: 170px;
-    height: 32px;
+    width: 250px;
+    height: 40px;
     position: relative;
-    border-bottom: 1px solid #e7e7e7;
-    line-height: 32px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
 
     .icon-search {
       font-size: 18px;
-      margin-left: 5px;
+      margin-right: 10px;
     }
 
     input {
-      width: 140px;
-      padding-left: 5px;
-      color: #666;
+      width: 100%;
+      padding: 0 10px;
+      color: #474747;
+      background: transparent;
+      border: none;
+      border-radius: 20px;
+      font-size: 20px;
+
+      &::placeholder {
+        color: #474747;
+      }
     }
   }
+
 
   .cart {
     width: 50px;
