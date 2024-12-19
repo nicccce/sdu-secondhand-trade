@@ -1,32 +1,40 @@
 <script setup>
 import { useCategoryStore } from '@/stores/category';
-import { onMounted, ref, watch } from 'vue';
-import { onBeforeRouteUpdate, useRoute } from 'vue-router';
+import { onMounted, ref, watch, computed } from 'vue';
+import { useRoute, onBeforeRouteUpdate } from 'vue-router';
 import { getBannerAPI } from '@/apis/home';
 import GoodItem from './components/GoodItem.vue';
 
-const categoryStore = useCategoryStore()
-const route = useRoute()
-const categoryData = ref(categoryStore.categoryList.find(category => category.id == route.params.id))
+const categoryStore = useCategoryStore();
+const route = useRoute();
 
-onBeforeRouteUpdate(to => {
-    categoryData.value = categoryStore.categoryList.find(category => category.id == to.params.id)
-    bannerList.value[bannerList.value.length - 1] = { img_url: categoryData.picture }
-})
+const bannerList = ref([]);
 
-const bannerList = ref([])
-
+// 获取 banner 数据
 const getBanner = async () => {
-    const res = await getBannerAPI()
-    bannerList.value = res.data
-    bannerList.value.push({ img_url: categoryData.picture })
+    const res = await getBannerAPI();
+    bannerList.value = res.data;
 }
 
-onMounted(() => getBanner())
+// 监听 categoryStore.categoryList 的变化，更新 categoryData
+const categoryData = computed(() => {
+    return categoryStore.categoryList.find(category => category.id == route.params.id) || {};
+});
+
+// 监听路由变化，更新 categoryData
+onBeforeRouteUpdate((to) => {
+        // 获取当前路由对应的分类数据
+        categoryData.value = categoryStore.categoryList.find(category => category.id == to.params.id) || {};
+});
+
+onMounted(() => {
+    // 在组件挂载时加载 banner 数据
+    getBanner()
+});
 </script>
 
 <template>
-    <div class="top-category">
+    <div class="top-category" v-if="categoryData.id">
         <div class="container m-top-20">
             <div class="bread-container">
                 <el-breadcrumb separator=">">
@@ -45,8 +53,8 @@ onMounted(() => getBanner())
                 <h3>全部分类</h3>
                 <ul>
                     <li v-for="i in categoryData.children" :key="i.id">
-                        <RouterLink to="/">
-                            <img :src="i.picture" />
+                        <RouterLink :to="`/category/sub/${i.id}`">
+                            <img v-img-lazy="i.picture" />
                             <p>{{ i.name }}</p>
                         </RouterLink>
                     </li>
@@ -61,6 +69,11 @@ onMounted(() => getBanner())
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- 加载中状态 -->
+    <div v-else>
+        <p>加载中...</p>
     </div>
 </template>
 

@@ -17,7 +17,7 @@ const staticStore = useStaticStore()
       <el-tag type="primary" class="campus-tag">
         {{ (staticStore.campusList.find(campus => campus.id === good.campus) || { name: '校外' }).name }}
       </el-tag>
-      <img :src="good.cover" alt="" />
+      <img v-img-lazy="good.cover" alt="" />
     </div>
     <p class="name ellipsis">{{ good.name }}</p>
     <p class="desc ellipsis">{{ good.description }}</p>
@@ -28,13 +28,13 @@ const staticStore = useStaticStore()
 <style scoped lang="scss">
 .goods-item {
   display: block;
-  width: 220px;
-  padding: 20px 30px;
+  width: 270px;
+  padding: 25px 49px;
   text-align: center;
   transition: all .5s;
 
   &:hover {
-    transform: translate3d(0, -3px, 0);
+    transform: translate3d(0, -10px, 0);
     box-shadow: 0 3px 8px rgb(0 0 0 / 20%);
   }
 
@@ -58,8 +58,8 @@ const staticStore = useStaticStore()
 
   .image-container {
     position: relative;
-    width: 160px;
-    height: 160px;
+    width: 175px;
+    height: 175px;
 
     img {
       width: 100%;
