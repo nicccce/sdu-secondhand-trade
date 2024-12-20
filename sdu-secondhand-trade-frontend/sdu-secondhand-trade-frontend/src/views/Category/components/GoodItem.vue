@@ -12,7 +12,7 @@ const staticStore = useStaticStore()
 </script>
 
 <template>
-  <RouterLink to="/" class="goods-item">
+  <RouterLink :to="`/detail/${good.id}`" class="goods-item">
     <div class="image-container">
       <el-tag type="primary" class="campus-tag">
         {{ (staticStore.campusList.find(campus => campus.id === good.campus) || { name: '校外' }).name }}

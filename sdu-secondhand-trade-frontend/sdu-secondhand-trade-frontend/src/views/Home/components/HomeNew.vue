@@ -24,7 +24,7 @@ onMounted(() => getNewGoods());
   <HomePanel title="新鲜好物" sub-title="二手宝藏，物超所值">
     <ul class="goods-list">
       <li v-for="item in goodList.slice(0, 10)" :key="item.id">
-        <RouterLink :to="`/`">
+        <RouterLink :to="`/detail/${item.id}`">
           <el-tag type="primary" class="campus-tag">
             {{ (staticStore.campusList.find(campus => campus.id === item.campus)||{name : '校外'}).name  }}
           </el-tag>

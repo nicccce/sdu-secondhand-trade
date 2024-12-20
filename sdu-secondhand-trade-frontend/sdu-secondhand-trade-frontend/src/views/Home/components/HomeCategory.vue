@@ -9,13 +9,13 @@ const staticStore = useStaticStore()
   <div class="home-category">
     <ul class="menu">
       <li v-for="item in categoryStore.categoryList" :key="item.id">
-        <RouterLink to="/">{{ item.name }}</RouterLink>
-        <RouterLink to="/">{{ item.introduction }}</RouterLink>
+        <RouterLink :to="`/category/${item.id}`">{{ item.name }}</RouterLink>
+        <RouterLink :to="`/category/${item.id}`">{{ item.introduction }}</RouterLink>
         <div class="layer">
           <h4>分类推荐 <small>根据您的购买或浏览记录推荐</small></h4>
           <ul>
             <li v-for="good in (item.goods || []).slice(0, 16)" :key="good.id">
-              <RouterLink to="/">
+              <RouterLink :to="`/detail/${good.id}`">
                 <img class="icon" v-img-lazy="good.cover" />
                 <div class="info">
                   <p class="name ellipsis-2">
