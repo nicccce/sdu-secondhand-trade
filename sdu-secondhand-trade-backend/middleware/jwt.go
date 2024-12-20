@@ -17,7 +17,11 @@ func JWT(minRoleID int) gin.HandlerFunc {
 		}
 		claims, err := util.ParseJWT(authHeader)
 		if err != nil {
-			aw.Error("该接口需要登录")
+			aw.Ctx.JSON(401, gin.H{
+				"code": -1,
+				"msg":  "该接口需要登录",
+				"data": nil,
+			})
 			aw.Ctx.Abort()
 			return
 		}
