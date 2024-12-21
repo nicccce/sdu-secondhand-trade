@@ -81,6 +81,9 @@ func Setup(engine *gin.Engine) {
 		good.GET("/:id", service.GetGoodsDetailed)
 		good.POST("/temporary/campus", service.GetUnfinishedGoodsByCampus)
 		good.POST("/sell", service.CreateGood)
+		good.POST("/cover/:good_id", service.UpdateGoodCover)
+		good.POST("/picture/:good_id", service.UpdateGoodPictures)
+		good.DELETE("/:id", service.DeleteGood)
 	}
 
 	order := engine.Group("/order")

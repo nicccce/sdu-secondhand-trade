@@ -3,6 +3,8 @@ package service
 import (
 	"github.com/gin-gonic/gin"
 	"math/rand"
+	"os"
+	"path/filepath"
 	"sdu-secondhand-trade-backend/app"
 	"sdu-secondhand-trade-backend/model"
 	"sdu-secondhand-trade-backend/util"
@@ -250,4 +252,175 @@ func (receiver GoodService) CreateGood(c *gin.Context) {
 	req.Seller = userClaim.UserID
 	goodModel.CreateGood(&req.Good)
 	aw.OK()
+}
+
+func (receiver GoodService) UpdateGoodCover(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	var goodId int
+	var err error
+
+	// 获取商品ID
+	if goodId, err = strconv.Atoi(c.Param("good_id")); err != nil || goodId < 1 {
+		aw.Error("无效的商品ID")
+		return
+	}
+
+	// 获取商品对象
+	good, err := goodModel.GetGoodByID(goodId)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+
+	// 获取前端上传的文件，字段名为"cover"
+	file, err := c.FormFile("cover")
+	if err != nil {
+		aw.Error("文件上传失败: " + err.Error())
+		return
+	}
+
+	// 检查上传的文件类型，确保是图片格式
+	// 你可以根据需要进一步完善这个检查，比如限制文件的扩展名或 MIME 类型
+	if !util.IsImage(file) {
+		aw.Error("请上传有效的图片文件")
+		return
+	}
+
+	// 获取文件扩展名
+	ext := filepath.Ext(file.Filename)
+	if ext == "" {
+		aw.Error("文件扩展名无效")
+		return
+	}
+
+	// 生成新的文件名，避免文件名重复
+	timestamp := time.Now().Unix()
+	newFileName := strconv.FormatInt(timestamp, 10) + ext
+
+	// 文件存储路径（项目根目录下的 "cover" 文件夹）
+	savePath := "./cover/" + newFileName
+
+	// 确保文件夹存在
+	if err := os.MkdirAll("./cover", os.ModePerm); err != nil {
+		aw.Error("无法创建文件夹: " + err.Error())
+		return
+	}
+
+	// 保存文件到服务器
+	if err := c.SaveUploadedFile(file, savePath); err != nil {
+		aw.Error("文件保存失败: " + err.Error())
+		return
+	}
+
+	// 将文件路径赋值给good对象的cover字段
+	good.Cover = savePath
+
+	//判断
+	pictures := picturesModel.FindPicturesByGoodID(goodId)
+	if len(pictures) != 0 {
+		good.IsEffective = true
+	}
+
+	// 更新数据库中的good记录
+	if err := goodModel.UpdateGood(&good); err != nil {
+		aw.Error("更新商品封面失败: " + err.Error())
+		return
+	}
+
+	// 返回成功
+	aw.OK()
+}
+
+func (receiver GoodService) UpdateGoodPictures(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	var goodId int
+	var err error
+
+	// 获取商品ID
+	if goodId, err = strconv.Atoi(c.Param("good_id")); err != nil || goodId < 1 {
+		aw.Error("无效的商品ID")
+		return
+	}
+
+	// 获取商品对象
+	good, err := goodModel.GetGoodByID(goodId)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	// 获取前端上传的文件，字段名为"picture"
+	file, err := c.FormFile("picture")
+	if err != nil {
+		aw.Error("文件上传失败: " + err.Error())
+		return
+	}
+
+	// 检查上传的文件类型，确保是图片格式
+	// 你可以根据需要进一步完善这个检查，比如限制文件的扩展名或 MIME 类型
+	if !util.IsImage(file) {
+		aw.Error("请上传有效的图片文件")
+		return
+	}
+
+	// 获取文件扩展名
+	ext := filepath.Ext(file.Filename)
+	if ext == "" {
+		aw.Error("文件扩展名无效")
+		return
+	}
+
+	// 生成新的文件名，避免文件名重复
+	timestamp := time.Now().Unix()
+	newFileName := strconv.FormatInt(timestamp, 10) + ext
+
+	// 文件存储路径（项目根目录下的 "cover" 文件夹）
+	savePath := "./pictures/" + newFileName
+
+	// 确保文件夹存在
+	if err := os.MkdirAll("./pictures", os.ModePerm); err != nil {
+		aw.Error("无法创建文件夹: " + err.Error())
+		return
+	}
+
+	// 保存文件到服务器
+	if err := c.SaveUploadedFile(file, savePath); err != nil {
+		aw.Error("文件保存失败: " + err.Error())
+		return
+	}
+
+	picture := &model.Pictures{
+		URL:    savePath,
+		GoodId: goodId,
+	}
+	picturesModel.CreatePicture(picture)
+
+	goodL, err := goodModel.GetGoodByID(goodId)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	if goodL.Cover != "" {
+		good.IsEffective = true
+	}
+	// 更新数据库中的good记录
+	if err := goodModel.UpdateGood(&good); err != nil {
+		aw.Error(err.Error())
+		return
+	}
+
+	// 返回成功
+	aw.OK()
+}
+
+func (receiver GoodService) DeleteGood(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	goodId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	picturesModel.DeletePictureByGoodId(goodId)
+	goodModel.DeleteGood(goodId)
+	aw.OK()
+
 }

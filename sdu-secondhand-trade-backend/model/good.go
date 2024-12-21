@@ -9,7 +9,7 @@ import (
 
 type Good struct {
 	GoodBrief
-	IsEffective       bool      `json:"is_effective" gorm:"default:true"`
+	IsEffective       bool      `json:"is_effective" gorm:"default:false"`
 	Brand             string    `json:"brand"`
 	Status            string    `json:"status"`
 	FullName          string    `json:"full_name"`
@@ -21,13 +21,13 @@ type Good struct {
 	SellerAddress     string    `json:"seller_address"`
 }
 type GoodBrief struct {
-	ID          int     `json:"id"`
-	Name        string  `json:"name"`
-	Price       float64 `json:"price"`
-	Description string  `json:"description"`
-	Campus      int     `json:"campus"` //campus_id
-	Cover       string  `json:"cover"`
-	Category    int     `json:"category"`
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Price       string `json:"price"`
+	Description string `json:"description"`
+	Campus      int    `json:"campus"` //campus_id
+	Cover       string `json:"cover"`
+	Category    int    `json:"category"`
 }
 
 type GoodModel struct {
@@ -145,5 +145,10 @@ func (receiver GoodModel) GetGoodBySellerID(id int) ([]Good, error) {
 
 func (receiver GoodModel) CreateGood(good *Good) {
 	err := receiver.Tx.Create(good).Error
+	util.ForwardOrPanic(err)
+}
+
+func (receiver GoodModel) DeleteGood(ID int) {
+	err := receiver.Tx.Where("id = ?", ID).Delete(&Good{}).Error
 	util.ForwardOrPanic(err)
 }

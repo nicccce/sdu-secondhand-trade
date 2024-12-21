@@ -47,3 +47,9 @@ func (receiver PicturesModel) UpdatePicture(picture *Pictures) {
 	err := receiver.Tx.Save(picture).Error
 	util.ForwardOrPanic(err)
 }
+
+// DeletePictureByGoodId 删除图片
+func (receiver PicturesModel) DeletePictureByGoodId(goodID int) {
+	err := receiver.Tx.Where("good_id = ?", goodID).Delete(&Pictures{}).Error
+	util.ForwardOrPanic(err)
+}
