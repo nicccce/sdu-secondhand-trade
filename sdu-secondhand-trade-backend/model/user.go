@@ -20,7 +20,7 @@ type UserInfo struct {
 	Phone        string    `json:"phone"`
 	Alipay       string    `json:"alipay"`
 	Introduction string    `json:"introduction"`
-	Campus       string    `json:"campus"`
+	Campus       int       `json:"campus"`
 	CreatedAt    time.Time `json:"created_at" binging:"-"`
 	Gender       string    `json:"gender"`
 }
@@ -67,13 +67,13 @@ func (receiver UserModel) FindUserByStudentID(studentID string) *User {
 
 func (receiver UserModel) GetAllUserGenders() []map[string]interface{} {
 	var results []map[string]interface{}
-	err := receiver.Tx.Model(&User{}).Select("gender, id").Find(&results).Error
+	err := receiver.Tx.Model(&User{}).Select("gender, id").Order("id desc").Find(&results).Error
 	util.ForwardOrPanic(err)
 	return results
 }
 func (receiver UserModel) GetAllUserCampus() []map[string]interface{} {
 	var results []map[string]interface{}
-	err := receiver.Tx.Model(&User{}).Select("id, campus").Find(&results).Error
+	err := receiver.Tx.Model(&Campus{}).Select("id, name").Order("id asc").Find(&results).Error
 	util.ForwardOrPanic(err)
 	return results
 }

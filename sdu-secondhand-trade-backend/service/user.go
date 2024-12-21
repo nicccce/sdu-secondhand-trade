@@ -235,7 +235,9 @@ func (receiver UserService) UpdateAddress(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	userClaim := util.ExtractUserClaims(c)
 	type updateReq struct {
-		Address string `json:"address" binding:"required"`
+		Address  string `json:"address" binding:"required"`
+		Receiver string `json:"receiver"`
+		Contact  string `json:"contact"`
 	}
 	var req updateReq
 	if err := c.ShouldBind(&req); err != nil {
@@ -252,14 +254,16 @@ func (receiver UserService) UpdateAddress(c *gin.Context) {
 		aw.Error("地址不存在")
 		return
 	}
-	if userClaim.RoleID <= 1 && address.UserID != userClaim.UserID {
+	if userClaim.RoleID < 1 && address.UserID != userClaim.UserID {
 		aw.Error("无更新权限")
 		return
 	}
 	address = &model.Address{
-		ID:      id,
-		Address: req.Address,
-		UserID:  userClaim.UserID,
+		ID:       id,
+		Address:  req.Address,
+		Receiver: req.Receiver,
+		Contact:  req.Contact,
+		UserID:   userClaim.UserID,
 	}
 	addressModel.UpdateAddress(address)
 	aw.OK()
@@ -330,4 +334,21 @@ func (receiver UserService) GetAllCampus(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	users := userModel.GetAllUserCampus()
 	aw.Success(users)
+}
+
+func (receiver UserService) CreateCampus(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	type updateReq struct {
+		name string `json:"name" binding:"required"`
+	}
+	var req updateReq
+	if err := c.ShouldBind(&req); err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	newCampus := &model.Campus{
+		Name: req.name,
+	}
+	campusModel.CreateCampus(newCampus)
+	aw.OK()
 }
