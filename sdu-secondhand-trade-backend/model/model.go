@@ -53,5 +53,24 @@ func Database_initialization() error {
 	if err := DB.AutoMigrate(&Address{}); err != nil {
 		return err
 	}
+	if err := DB.AutoMigrate(&Category{}); err != nil {
+		return err
+	}
+	if err := DB.AutoMigrate(&Banner{}); err != nil {
+		return err
+	}
+	if err := DB.AutoMigrate(&Good{}); err != nil {
+		return err
+	}
+	if err := DB.AutoMigrate(&Pictures{}); err != nil {
+		return err
+	}
+	if err := DB.AutoMigrate(&Campus{}); err != nil {
+		return err
+	}
+	if err := DB.AutoMigrate(&Order{}); err != nil {
+	}
+	if err := DB.AutoMigrate(&Problem{}); err != nil {
+	}
 	return nil
 }

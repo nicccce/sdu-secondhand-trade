@@ -64,4 +64,45 @@ func Setup(engine *gin.Engine) {
 		static.GET("/gender", service.GetAllGender)
 		static.GET("/campus", service.GetAllCampus)
 	}
+
+	good := engine.Group("/good")
+	{
+		service := service.GoodService{}
+		good.GET("/banner", service.GetBanner)
+		good.GET("/category", service.GetAllCategory)
+		good.GET("/category/recommend/:category_id", service.GetRecommendedGoods)
+		good.GET("/new", service.GetLatestGoods)
+		good.GET("/campus/:campus_id", service.GetGoodsByCampus)
+		good.POST("/temporary/time", service.GetUnfinishedGoodsByTime)
+	}
+	good.Use(middleware.JWT(1))
+	{
+		service := service.GoodService{}
+		good.GET("/:id", service.GetGoodsDetailed)
+		good.POST("/temporary/campus", service.GetUnfinishedGoodsByCampus)
+		good.POST("/sell", service.CreateGood)
+		good.POST("/cover/:good_id", service.UpdateGoodCover)
+		good.POST("/picture/:good_id", service.UpdateGoodPictures)
+		good.DELETE("/:id", service.DeleteGood)
+	}
+
+	order := engine.Group("/order")
+	order.Use(middleware.JWT(1))
+	{
+		service := service.OrderService{}
+		order.POST("/init", service.CreateOrder)
+		order.DELETE("/:id", service.CancelOrder)
+		order.POST("/submit", service.SubmitOrder)
+		order.GET("/:id", service.GetOrder)
+		order.POST("/buyer", service.GetBuyerOrder)
+		order.POST("/seller", service.GetSellerOrder)
+	}
+
+	problem := engine.Group("/problem")
+	problem.Use(middleware.JWT(1))
+	{
+		service := service.ProblemService{}
+		problem.POST("/after_sale", service.CreateProblem)
+	}
+
 }

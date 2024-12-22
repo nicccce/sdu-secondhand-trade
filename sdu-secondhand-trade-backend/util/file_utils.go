@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sdu-secondhand-trade-backend/conf"
+	"strings"
 )
 
 // SaveUploadedFile 保存上传的文件到指定路径
@@ -65,4 +66,11 @@ func SaveAsPNG(file *multipart.FileHeader, filePath string) error {
 	}
 
 	return nil
+}
+
+// IsImage 检查上传的文件是否为图片
+func IsImage(file *multipart.FileHeader) bool {
+	// 获取文件扩展名
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	return ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif"
 }

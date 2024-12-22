@@ -5,9 +5,11 @@ import (
 )
 
 type Address struct {
-	ID      int    `json:"id"`
-	UserID  int    `json:"user_id"`
-	Address string `json:"address"`
+	ID       int    `json:"id"`
+	UserID   int    `json:"user_id"`
+	Address  string `json:"address"`
+	Receiver string `json:"receiver"`
+	Contact  string `json:"contact"`
 }
 
 type AddressModel struct {
