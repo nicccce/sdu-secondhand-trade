@@ -115,4 +115,13 @@ func Setup(engine *gin.Engine) {
 		problem.POST("/update", service.UpdateProblem)
 	}
 
+	r := engine.Group("/pay")
+	r.Use(middleware.JWT(1))
+	{
+		service := service.AlipayService{}
+		r.GET("/alipay", service.Pay)
+		r.GET("/alipay/callback", service.Callback)
+		r.GET("/alipay/notify/:order_id", service.Notify)
+	}
+
 }

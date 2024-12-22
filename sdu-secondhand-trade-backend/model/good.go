@@ -23,7 +23,7 @@ type Good struct {
 type GoodBrief struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
-	Price       string `json:"price"`
+	Price       int    `json:"price"`
 	Description string `json:"description"`
 	Campus      int    `json:"campus"` //campus_id
 	Cover       string `json:"cover"`
