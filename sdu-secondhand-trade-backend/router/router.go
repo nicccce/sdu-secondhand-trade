@@ -74,6 +74,7 @@ func Setup(engine *gin.Engine) {
 		good.GET("/new", service.GetLatestGoods)
 		good.GET("/campus/:campus_id", service.GetGoodsByCampus)
 		good.POST("/temporary/time", service.GetUnfinishedGoodsByTime)
+		good.POST("/all", service.GetAllGoods)
 	}
 	good.Use(middleware.JWT(1))
 	{
@@ -84,6 +85,7 @@ func Setup(engine *gin.Engine) {
 		good.POST("/cover/:good_id", service.UpdateGoodCover)
 		good.POST("/picture/:good_id", service.UpdateGoodPictures)
 		good.DELETE("/:id", service.DeleteGood)
+		good.POST("/my", service.GetMyGood)
 	}
 
 	order := engine.Group("/order")
@@ -103,6 +105,14 @@ func Setup(engine *gin.Engine) {
 	{
 		service := service.ProblemService{}
 		problem.POST("/after_sale", service.CreateProblem)
+		problem.POST("/get", service.GetMyProblem)
+	}
+
+	problem.Use(middleware.JWT(2))
+	{
+		service := service.ProblemService{}
+		problem.POST("/all", service.GetAllProblem)
+		problem.POST("/update", service.UpdateProblem)
 	}
 
 }

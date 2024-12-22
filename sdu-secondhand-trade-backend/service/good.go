@@ -298,10 +298,10 @@ func (receiver GoodService) UpdateGoodCover(c *gin.Context) {
 	newFileName := strconv.FormatInt(timestamp, 10) + ext
 
 	// 文件存储路径（项目根目录下的 "cover" 文件夹）
-	savePath := "./cover/" + newFileName
+	savePath := "../cover/" + newFileName
 
 	// 确保文件夹存在
-	if err := os.MkdirAll("./cover", os.ModePerm); err != nil {
+	if err := os.MkdirAll("../cover", os.ModePerm); err != nil {
 		aw.Error("无法创建文件夹: " + err.Error())
 		return
 	}
@@ -374,10 +374,10 @@ func (receiver GoodService) UpdateGoodPictures(c *gin.Context) {
 	newFileName := strconv.FormatInt(timestamp, 10) + ext
 
 	// 文件存储路径（项目根目录下的 "cover" 文件夹）
-	savePath := "./pictures/" + newFileName
+	savePath := "../pictures/" + newFileName
 
 	// 确保文件夹存在
-	if err := os.MkdirAll("./pictures", os.ModePerm); err != nil {
+	if err := os.MkdirAll("../pictures", os.ModePerm); err != nil {
 		aw.Error("无法创建文件夹: " + err.Error())
 		return
 	}
@@ -414,13 +414,83 @@ func (receiver GoodService) UpdateGoodPictures(c *gin.Context) {
 
 func (receiver GoodService) DeleteGood(c *gin.Context) {
 	aw := app.NewWrapper(c)
+	userClaim := util.ExtractUserClaims(c)
 	goodId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		aw.Error(err.Error())
 		return
 	}
+	if userClaim.RoleID == 1 {
+		good, err := goodModel.GetGoodByID(goodId)
+		if err != nil {
+			aw.Error(err.Error())
+			return
+		}
+		if good.Seller != userClaim.UserID {
+			aw.Error("无权限删除")
+			return
+		}
+	}
+
 	picturesModel.DeletePictureByGoodId(goodId)
 	goodModel.DeleteGood(goodId)
 	aw.OK()
+
+}
+
+type GoodDTO struct {
+	Total  int          `json:"total"`
+	GoodsV []model.Good `json:"goods"`
+}
+
+func (receiver GoodService) GetAllGoods(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	type GoodReq struct {
+		IsEffective int    `json:"is_effective"`
+		Page        int    `json:"page"`
+		PageSize    int    `json:"page_size"`
+		Search      string `json:"search"`
+	}
+	var req GoodReq
+	if err := c.ShouldBind(&req); err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	goods, tt, err := goodModel.GetAllGoods(req.IsEffective, req.Page, req.PageSize, req.Search)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	goodLL := &GoodDTO{
+		Total:  tt,
+		GoodsV: goods,
+	}
+	aw.Success(goodLL)
+}
+
+func (receiver GoodService) GetMyGood(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	userClaim := util.ExtractUserClaims(c)
+	type GoodReq struct {
+		IsEffective int    `json:"is_effective"`
+		Page        int    `json:"page"`
+		PageSize    int    `json:"page_size"`
+		Search      string `json:"search"`
+	}
+	var req GoodReq
+	if err := c.ShouldBind(&req); err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	goods, tt, err := goodModel.GetMyGoods(req.IsEffective, req.Page, req.PageSize, userClaim.UserID, req.Search)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	goodLL := &GoodDTO{
+		Total:  tt,
+		GoodsV: goods,
+	}
+	aw.Success(goodLL)
 
 }

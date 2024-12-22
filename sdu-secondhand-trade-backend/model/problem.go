@@ -48,3 +48,53 @@ func (receiver ProblemModel) UpdateProblem(problem *Problem) {
 	err := receiver.Tx.Save(problem).Error
 	util.ForwardOrPanic(err)
 }
+
+func (receiver ProblemModel) GetAllProblems(status int, page int, pageSize int) ([]Problem, int, error) {
+	var problems []Problem
+	var total int64
+
+	// 构建查询条件
+	query := receiver.Tx
+
+	// 如果 status 不是 -1，则添加 status 条件
+	if status != -1 {
+		query = query.Where("status = ?", status)
+	}
+
+	// 分页查询
+	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&problems).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 查询符合条件的总记录数
+	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return problems, int(total), nil
+}
+
+func (receiver ProblemModel) GetMyProblem(status int, page int, pageSize int, userId int) ([]Problem, int, error) {
+	var problems []Problem
+	var total int64
+
+	// 构建查询条件
+	query := receiver.Tx.Where("user_id = ?", userId)
+
+	// 如果 status 不是 -1，则添加 status 条件
+	if status != -1 {
+		query = query.Where("status = ?", status)
+	}
+
+	// 分页查询
+	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&problems).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 查询符合条件的总记录数
+	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return problems, int(total), nil
+}

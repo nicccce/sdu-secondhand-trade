@@ -35,15 +35,6 @@ func (receiver *OrderModel) GetOrderByID(id int) (*Order, error) {
 	return &order, nil
 }
 
-// GetOrdersByBuyerID 根据买家 ID 获取订单列表
-func (receiver *OrderModel) GetOrdersByBuyerID(buyerID int, limit, offset int) ([]Order, error) {
-	var orders []Order
-	if err := receiver.Tx.Where("buyer_id = ?", buyerID).Limit(limit).Offset(offset).Find(&orders).Error; err != nil {
-		return nil, err
-	}
-	return orders, nil
-}
-
 // UpdateOrder 更新订单信息
 func (receiver *OrderModel) UpdateOrder(order *Order) error {
 	if err := receiver.Tx.Save(order).Error; err != nil {
@@ -61,8 +52,9 @@ func (receiver *OrderModel) DeleteOrder(id int) error {
 }
 
 // GetOrdersByBuyerIDAndStatus 分页查询，根据 buyer_id 和 status 获取订单列表
-func (receiver *OrderModel) GetOrdersByBuyerIDAndStatus(buyerID, status, page, pageSize int) ([]Order, error) {
+func (receiver *OrderModel) GetOrdersByBuyerIDAndStatus(buyerID, status, page, pageSize int) ([]Order, int, error) {
 	var orders []Order
+	var total int64
 	offset := (page - 1) * pageSize // 计算偏移量
 
 	// 构建查询条件
@@ -71,15 +63,21 @@ func (receiver *OrderModel) GetOrdersByBuyerIDAndStatus(buyerID, status, page, p
 
 	// 执行查询
 	if err := query.Find(&orders).Error; err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return orders, nil
+	// 查询符合条件的总订单数
+	if err := receiver.Tx.Model(&Order{}).Where("buyer_id = ? AND status = ?", buyerID, status).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return orders, int(total), nil
 }
 
 // GetOrdersBySellerIDAndStatus 分页查询，根据 seller_id 和 status 获取订单列表
-func (receiver *OrderModel) GetOrdersBySellerIDAndStatus(goodID, status, page, pageSize int) ([]Order, error) {
+func (receiver *OrderModel) GetOrdersBySellerIDAndStatus(goodID, status, page, pageSize int) ([]Order, int, error) {
 	var orders []Order
+	var total int64
 	offset := (page - 1) * pageSize // 计算偏移量
 
 	// 构建查询条件
@@ -88,10 +86,15 @@ func (receiver *OrderModel) GetOrdersBySellerIDAndStatus(goodID, status, page, p
 
 	// 执行查询
 	if err := query.Find(&orders).Error; err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return orders, nil
+	// 查询符合条件的总订单数
+	if err := receiver.Tx.Model(&Order{}).Where("good_id = ? AND status = ?", goodID, status).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return orders, int(total), nil
 }
 
 // GetOrderByGoodID 根据 ID 获取订单
@@ -101,4 +104,50 @@ func (receiver *OrderModel) GetOrderByGoodID(id int) (*Order, error) {
 		return nil, err
 	}
 	return &order, nil
+}
+
+// GetOrdersByBuyerID 根据买家 ID 获取订单列表
+func (receiver *OrderModel) GetOrdersByBuyerID(buyerID, page, pageSize int) ([]Order, int, error) {
+	var orders []Order
+	var total int64
+	offset := (page - 1) * pageSize // 计算偏移量
+
+	// 构建查询条件
+	query := receiver.Tx.Where("buyer_id = ? ", buyerID).
+		Limit(pageSize).Offset(offset) // 设置分页条件
+
+	// 执行查询，获取订单列表
+	if err := query.Find(&orders).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 查询符合条件的总订单数
+	if err := receiver.Tx.Model(&Order{}).Where("buyer_id = ?", buyerID).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return orders, int(total), nil
+}
+
+// GetOrdersByGoodID 根据商品 ID 获取订单列表
+func (receiver *OrderModel) GetOrdersByGoodID(goodID, page, pageSize int) ([]Order, int, error) {
+	var orders []Order
+	var total int64
+	offset := (page - 1) * pageSize // 计算偏移量
+
+	// 构建查询条件
+	query := receiver.Tx.Where("good_id = ? ", goodID).
+		Limit(pageSize).Offset(offset) // 设置分页条件
+
+	// 执行查询，获取订单列表
+	if err := query.Find(&orders).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 查询符合条件的总订单数
+	if err := receiver.Tx.Model(&Order{}).Where("good_id = ? ", goodID).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return orders, int(total), nil
 }

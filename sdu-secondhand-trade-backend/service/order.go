@@ -285,7 +285,7 @@ func (receiver *OrderService) GetOrder(c *gin.Context) {
 }
 
 type OrderVo struct {
-	total int           `json:"total"`
+	Total int           `json:"total"`
 	LL    []model.Order `json:"order"`
 }
 
@@ -302,13 +302,28 @@ func (receiver *OrderService) GetBuyerOrder(c *gin.Context) {
 		aw.Error(err.Error())
 		return
 	}
-	order, err := orderModel.GetOrdersByBuyerIDAndStatus(userClaim.UserID, *req.Status, req.Page, req.PageSize)
+
+	if *req.Status == -1 {
+		order, tt, err := orderModel.GetOrdersByBuyerID(userClaim.UserID, req.Page, req.PageSize)
+		if err != nil {
+			aw.Error(err.Error())
+			return
+		}
+		orderVo := &OrderVo{
+			Total: tt,
+			LL:    order,
+		}
+		aw.Success(orderVo)
+		return
+	}
+
+	order, tt, err := orderModel.GetOrdersByBuyerIDAndStatus(userClaim.UserID, *req.Status, req.Page, req.PageSize)
 	if err != nil {
 		aw.Error(err.Error())
 		return
 	}
 	orderVo := &OrderVo{
-		total: len(order),
+		Total: tt,
 		LL:    order,
 	}
 	// 返回订单信息
@@ -335,16 +350,32 @@ func (receiver *OrderService) GetSellerOrder(c *gin.Context) {
 	}
 	var order []model.Order
 	var orders []model.Order
-	for _, good := range goods {
-		order, err = orderModel.GetOrdersByBuyerIDAndStatus(good.ID, *req.Status, req.Page, req.PageSize)
-		if err != nil {
-			aw.Error(err.Error())
-			return
+	var tt int
+	var sum int
+	if *req.Status == -1 {
+		for _, good := range goods {
+			order, tt, err = orderModel.GetOrdersByGoodID(good.ID, req.Page, req.PageSize)
+			if err != nil {
+				aw.Error(err.Error())
+				return
+			}
+			sum += tt
+			orders = append(orders, order...)
 		}
-		orders = append(orders, order...)
+	} else {
+		for _, good := range goods {
+			order, tt, err = orderModel.GetOrdersBySellerIDAndStatus(good.ID, *req.Status, req.Page, req.PageSize)
+			if err != nil {
+				aw.Error(err.Error())
+				return
+			}
+			sum += tt
+			orders = append(orders, order...)
+		}
 	}
+
 	orderVo := &OrderVo{
-		total: len(orders),
+		Total: sum,
 		LL:    orders,
 	}
 	// 返回订单信息
