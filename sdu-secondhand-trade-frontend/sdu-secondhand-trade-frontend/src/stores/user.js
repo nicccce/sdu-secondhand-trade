@@ -15,10 +15,12 @@ export const useUserStore = defineStore('user', () => {
         userInfo.value = res.data
     }
 
-    const refreshUserInfo = async()=>{
+    const refreshUserInfo = async () => {
+        const currentToken = userInfo.value.token
         const res = await refreshAPI()
-        if(res.code===0){
+        if (res.code === 0) {
             userInfo.value = res.data
+            userInfo.value.token = currentToken
         }
     }
 

@@ -21,6 +21,12 @@ export const getMyGoodAPI = (data) =>httpInstance({
     data
 })
 
+export const getAllGoodAPI = (data) =>httpInstance({
+    url: '/good/all',
+    method:'POST',
+    data
+})
+
 export const deleteGoodAPI = (id) =>httpInstance({
     url: `/good/${id}`,
     method:'DELETE'

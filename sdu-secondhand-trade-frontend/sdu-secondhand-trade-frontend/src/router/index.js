@@ -14,7 +14,10 @@ import UserBuyOrder from '@/views/User/components/UserBuyOrder.vue'
 import UserSellOrder from '@/views/User/components/UserSellOrder.vue'
 import Sell from '@/views/Sell/index.vue'
 import UserGood from '@/views/User/components/UserGood.vue'
-
+import UserAfterSale from '@/views/User/components/UserAfterSale.vue'
+import AdminUser from '@/views/User/components/AdminUser.vue'
+import AdminGood from '@/views/User/components/AdminGood.vue'
+import AdminAfterSale from '@/views/User/components/AdminAfterSale.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -82,6 +85,26 @@ const router = createRouter({
               path: 'good',
               name: 'good',
               component: UserGood,
+            },
+            {
+              path: 'problem',
+              name: 'problem',
+              component: UserAfterSale,
+            },
+            {
+              path: 'admin/user',
+              name: 'adminUser',
+              component: AdminUser,
+            },
+            {
+              path: 'admin/good',
+              name: 'adminGood',
+              component: AdminGood,
+            },
+            {
+              path: 'admin/problem',
+              name: 'adminProblem',
+              component: AdminAfterSale,
             }
           ]
         },

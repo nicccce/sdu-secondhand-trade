@@ -7,10 +7,14 @@ import App from './App.vue'
 import router from './router'
 import { lazyPlugin } from './utils/imgLazy'
 import { componentPlugin } from './components'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 import '@/styles/common.scss'
 
 const app = createApp(App)
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component)
+  }
 const pinia = createPinia()
 
 pinia.use(piniaPluginPersistedstate)

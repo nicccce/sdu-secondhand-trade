@@ -18,16 +18,6 @@ const categoryStore = useCategoryStore()
           <RouterLink active-class="active" :to="`/category/${item.id}`">{{ item.name }}</RouterLink>
         </li>
       </ul>
-      <div class="right">
-        <ul>
-          <li>
-            <RouterLink to="/">校区</RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/">专题</RouterLink>
-          </li>
-        </ul>
-      </div>
     </div>
   </div>
 </template>

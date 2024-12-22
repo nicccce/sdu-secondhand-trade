@@ -1,4 +1,14 @@
-<script setup></script>
+<script setup>
+import { useUserStore } from '@/stores/user';
+import { computed, onMounted } from 'vue';
+
+const userStore = useUserStore()
+const isAdmin = computed(()=>userStore.userInfo.role_id>1)
+onMounted(async ()=>{
+await userStore.refreshUserInfo()
+})
+
+</script>
 
 <template>
     <div class="container">
@@ -17,6 +27,12 @@
                 <h4>售后管理</h4>
                 <div class="links">
                     <RouterLink to="/user/problem">我的售后</RouterLink>
+                </div>
+                <h4 v-if="isAdmin">网站管理</h4>
+                <div class="links" v-if="isAdmin">
+                    <RouterLink to="/user/admin/user">用户管理</RouterLink>
+                    <RouterLink to="/user/admin/good">商品管理</RouterLink>
+                    <RouterLink to="/user/admin/problem">售后服务</RouterLink>
                 </div>
             </div>
         </div>

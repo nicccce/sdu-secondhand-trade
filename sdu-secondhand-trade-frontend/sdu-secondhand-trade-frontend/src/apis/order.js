@@ -39,3 +39,21 @@ export const sendAfterSaleAPI = (data) => httpInstance({
     method: 'POST',
     data
 })
+
+export const getAfterSaleAPI = (data) => httpInstance({
+    url: '/problem/get',
+    method: 'POST',
+    data
+})
+
+export const getAllAfterSaleAPI = (data) => httpInstance({
+    url: '/problem/all',
+    method: 'POST',
+    data
+})
+
+export const updateAfterSaleAPI = (data) => httpInstance({
+    url: '/problem/update',
+    method: 'POST',
+    data
+})

@@ -1,4 +1,5 @@
 <script setup>
+import { updatePasswordAPI } from '@/apis/user';
 import { addAddressAPI, deleteAddressAPI, updateAddressAPI, updateUserAPI } from '@/apis/user';
 import { useStaticStore } from '@/stores/static';
 import { useUserStore } from '@/stores/user';
@@ -153,10 +154,65 @@ const saveChanges = () => {
   })
 }
 
-const cancelEdit = ()=>{
+const cancelEdit = () => {
   isEditing.value = false
 }
 
+
+const passwordRules = {
+  oldPassword: [
+    { required: true, message: '请输入旧密码', trigger: 'blur' },
+  ],
+  password: [
+    { required: true, message: '密码不能为空！', trigger: 'blur' },
+    { min: 6, max: 16, message: '密码必须介于6位至16位之间！', trigger: 'blur' }
+  ],
+  confirmPassword: [
+    { required: true, message: '请确认密码', trigger: 'blur' },
+    { min: 6, max: 16, message: '密码必须介于6位至16位之间！', trigger: 'blur' },
+  ]
+};
+
+const passwordForm = ref(null);
+const newPasswordData = ref({
+  oldPassword: '',
+  password: '',
+  confirmPassword: ''
+});
+
+// 修改密码逻辑
+const submitPasswordChange = async () => {
+  passwordForm.value.validate(async (valid) => {
+    if (!valid) return;
+
+    // 确保新密码和确认密码一致
+    if (newPasswordData.value.password !== newPasswordData.value.confirmPassword) {
+      ElMessage({
+        type: 'error',
+        message: '新密码与确认密码不一致！'
+      });
+      return;
+    }
+
+    // 调用接口提交修改密码请求
+    const res = await updatePasswordAPI({
+      old_password: newPasswordData.value.oldPassword,
+      new_password: newPasswordData.value.password
+    });
+    if (res.code === 0) {
+      ElMessage({
+        type: 'success',
+        message: '密码修改成功！'
+      });
+      switcher.value = 0; // 修改密码成功后返回到个人信息页面
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '密码修改失败，请稍后再试！'
+      });
+    }
+  });
+};
 </script>
 
 <template>
@@ -176,6 +232,10 @@ const cancelEdit = ()=>{
       <a href="javascript:;">
         <span class="iconfont icon-dw" @click="switcher = 1"></span>
         <p @click="switcher = 1">地址信息</p>
+      </a>
+      <a href="javascript:;">
+        <span class="iconfont icon-aq" @click="switcher = 2"></span>
+        <p @click="">修改密码</p>
       </a>
     </div>
   </div>
@@ -269,7 +329,7 @@ const cancelEdit = ()=>{
         </div>
       </div>
     </div>
-    <div class="address-panel" v-else>
+    <div class="address-panel" v-if="switcher === 1">
       <div class="header">
         <h4 data-v-bcb266e0="">我的地址</h4>
         <el-button type="primary" style="margin-right: 100px;" @click="showAddressDialog = true">添加地址</el-button>
@@ -291,6 +351,30 @@ const cancelEdit = ()=>{
           </div>
         </div>
       </div>
+    </div>
+    <div class="password-panel" v-if="switcher === 2">
+      <div class="header">
+        <h4>修改密码</h4>
+      </div>
+
+      <el-form :model="newPasswordData" ref="passwordForm" :rules="passwordRules" label-width="120px">
+        <el-form-item label="旧密码" prop="oldPassword">
+          <el-input v-model="newPasswordData.oldPassword" placeholder="请输入旧密码" type="password"></el-input>
+        </el-form-item>
+
+        <el-form-item label="新密码" prop="password">
+          <el-input v-model="newPasswordData.password" placeholder="请输入新密码" type="password"></el-input>
+        </el-form-item>
+
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input v-model="newPasswordData.confirmPassword" placeholder="请确认新密码" type="password"></el-input>
+        </el-form-item>
+
+        <div class="actions">
+          <el-button type="primary" @click="submitPasswordChange">确认修改</el-button>
+          <el-button @click="switcher = 0">取消</el-button>
+        </div>
+      </el-form>
     </div>
   </div>
 
@@ -505,6 +589,39 @@ const cancelEdit = ()=>{
     }
 
   }
+}
 
+.password-panel {
+  background-color: #fff;
+  padding: 50px 400px;
+  margin-top: 20px;
+
+  .header {
+    height: 66px;
+    border-bottom: 1px solid #f5f5f5;
+    padding: 18px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+
+    h4 {
+      font-size: 22px;
+      font-weight: 400;
+    }
+  }
+
+  .actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+
+    el-button {
+      margin-left: 10px;
+    }
+  }
+
+  .el-form-item {
+    margin-bottom: 20px;
+  }
 }
 </style>

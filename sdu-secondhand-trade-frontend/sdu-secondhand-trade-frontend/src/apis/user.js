@@ -38,3 +38,19 @@ export const updateAddressAPI = (data) => httpInstance({
     method: 'POST',
     data
 })
+
+export const getUserByIdAPI = (id) => httpInstance({
+    url: `/user/${id}`,
+    method: 'GET',
+})
+
+export const getAllUsersAPI = () =>httpInstance({
+    url: `/user`,
+    method: 'GET'
+})
+
+export const updatePasswordAPI = (data)=>httpInstance({
+    url:'/user/password',
+    method: 'POST',
+    data
+})
