@@ -23,7 +23,7 @@ type Good struct {
 type GoodBrief struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
-	Price       string `json:"price"`
+	Price       int    `json:"price"`
 	Description string `json:"description"`
 	Campus      int    `json:"campus"` //campus_id
 	Cover       string `json:"cover"`
@@ -133,7 +133,7 @@ func (receiver GoodModel) UpdateGood(good *Good) error {
 func (receiver GoodModel) GetGoodBySellerID(id int) ([]Good, error) {
 	var good []Good
 
-	if err := receiver.Tx.Where("seller_id = ?", id).Find(&good).Error; err != nil {
+	if err := receiver.Tx.Where("seller = ?", id).Find(&good).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -151,4 +151,131 @@ func (receiver GoodModel) CreateGood(good *Good) {
 func (receiver GoodModel) DeleteGood(ID int) {
 	err := receiver.Tx.Where("id = ?", ID).Delete(&Good{}).Error
 	util.ForwardOrPanic(err)
+}
+
+/*// GetAllGoods 获取所有商品（包括有效的商品），支持根据search进行模糊查询
+func (receiver GoodModel) GetAllGoods(isEffective int, page int, pageSize int, search string) ([]Good, int, error) {
+	var goods []Good
+	var total int64
+	// 如果传入的search为空，直接进行分页查询
+	if search == "" {
+		if isEffective == -1 {
+			if err := receiver.Tx.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
+				return nil, 0, err
+			}
+			// 查询符合条件的总订单数
+			if err := receiver.Tx.Model(&Order{}).Count(&total).Error; err != nil {
+				return nil, 0, err
+			}
+			return goods, int(total), nil
+		} else {
+			query := receiver.Tx.Where("is_effective = ?", isEffective)
+			if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
+				return nil, 0, err
+			}
+			// 查询符合条件的总订单数
+			if err := query.Model(&Order{}).Count(&total).Error; err != nil {
+				return nil, 0, err
+			}
+			return goods, int(total), nil
+		}
+
+	}
+
+	// 否则进行模糊查询
+
+	// 模糊查询所有字段
+	query := receiver.Tx.Where(
+		"full_name LIKE ? OR brand LIKE ? OR status LIKE ? OR specification LIKE ? OR detail LIKE ? OR name LIKE ? OR description LIKE ?",
+		"%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%",
+	)
+	if isEffective == -1 {
+		if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
+			return nil, 0, err
+		}
+		// 查询符合条件的总订单数
+		if err := query.Model(&Order{}).Count(&total).Error; err != nil {
+			return nil, 0, err
+		}
+
+		return goods, int(total), nil
+	}
+
+	query = query.Where("is_effective = ?", isEffective)
+
+	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
+		return nil, 0, err
+	}
+	// 查询符合条件的总订单数
+	if err := query.Model(&Order{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return goods, int(total), nil
+}
+*/
+
+// GetAllGoods 获取所有商品（包括有效的商品），支持根据search进行模糊查询
+func (receiver GoodModel) GetAllGoods(isEffective int, page int, pageSize int, search string) ([]Good, int, error) {
+	var goods []Good
+	var total int64
+
+	// 构建查询条件
+	query := receiver.Tx
+	if search != "" {
+		// 模糊查询所有字段
+		query = query.Where(
+			"full_name LIKE ? OR brand LIKE ? OR status LIKE ? OR specification LIKE ? OR detail LIKE ? OR name LIKE ? OR description LIKE ?",
+			"%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%",
+		)
+	}
+
+	// 如果 isEffective 不是 -1，则添加 isEffective 条件
+	if isEffective != -1 {
+		query = query.Where("is_effective = ?", isEffective)
+	}
+
+	// 分页查询
+	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 查询符合条件的总记录数
+	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return goods, int(total), nil
+}
+
+// GetMyGoods 根据分类ID、页码、页面大小以及排序字段查询商品，返回指定分页的商品列表
+func (receiver GoodModel) GetMyGoods(isEffective int, page int, pageSize int, userID int, search string) ([]Good, int, error) {
+	var goods []Good
+	var total int64
+
+	// 构建查询条件
+	query := receiver.Tx.Where("seller = ?", userID)
+	if search != "" {
+		// 模糊查询所有字段
+		query = query.Where(
+			"full_name LIKE ? OR brand LIKE ? OR status LIKE ? OR specification LIKE ? OR detail LIKE ? OR name LIKE ? OR description LIKE ?",
+			"%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%",
+		)
+	}
+
+	// 如果 isEffective 不是 -1，则添加 isEffective 条件
+	if isEffective != -1 {
+		query = query.Where("is_effective = ?", isEffective)
+	}
+	// 分页查询
+	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 查询符合条件的总记录数
+	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return goods, int(total), nil
 }
