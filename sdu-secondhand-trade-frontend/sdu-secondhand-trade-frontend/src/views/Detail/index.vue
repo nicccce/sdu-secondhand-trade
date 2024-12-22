@@ -2,16 +2,22 @@
 import { getGoodDetailAPI } from '@/apis/good'
 import { useCategoryStore } from '@/stores/category';
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import GoodItem from '../Category/components/GoodItem.vue';
 import ImageView from '@/components/ImageView/index.vue'
+import { useStaticStore } from '@/stores/static';
+import { initOrderAPI } from '@/apis/order';
 const good = ref({})
 const route = useRoute()
 const getGood = async () => {
   const res = await getGoodDetailAPI(route.params.id)
   good.value = res.data
+  if (!good.value.is_effective) {
+    showErrorMessage()
+  }
 }
 
+const staticStore = useStaticStore();
 const categoryStore = useCategoryStore();
 
 const categoryData = computed(() => {
@@ -33,9 +39,42 @@ const categoryData = computed(() => {
   return foundCategory || {}; // 如果没有找到符合条件的分类，返回空对象
 });
 
+
+
 onMounted(() => {
   getGood()
 })
+
+
+const router = useRouter()
+// 显示弹窗并返回首页
+const showErrorMessage = async () => {
+  try {
+    await ElMessageBox.confirm(
+      '当前商品已被删除或商品已售出，是否返回上一页？',
+      '提示',
+      {
+        confirmButtonText: '返回',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    router.go(-1)
+  } catch (error) {
+  }
+}
+
+const buy = async () => {
+  try {
+    const res = await initOrderAPI(good.value.id)
+    if (res.code === 0) {
+      router.push(`/order/${res.data.order_id}`)
+    }
+  } catch {
+    showErrorMessage()
+  }
+
+}
 
 </script>
 
@@ -58,7 +97,7 @@ onMounted(() => {
           <div class="goods-info">
             <div class="media">
               <!-- 图片预览区 -->
-              <ImageView :imageList="good.pictures||[]"/>
+              <ImageView :imageList="good.pictures.slice(0, 5) || []" />
 
             </div>
             <div class="spec">
@@ -86,8 +125,8 @@ onMounted(() => {
               </div>
               <!-- 按钮组件 -->
               <div>
-                <el-button size="large" class="btn">
-                  收藏
+                <el-button size="large" class="btn" @click="buy()">
+                  购买
                 </el-button>
               </div>
 
@@ -117,7 +156,7 @@ onMounted(() => {
                     </li>
                     <li>
                       <span class="dt">交易方式</span>
-                      <span class="dd">{{ good.transaction_method }}</span>
+                      <span class="dd">{{ staticStore.getTransactionMethod(good.transaction_method) }}</span>
                     </li>
                     <li>
                       <span class="dt">品牌</span>
@@ -128,6 +167,37 @@ onMounted(() => {
                       <span class="dd">{{ good.campus }}</span>
                     </li>
                   </ul>
+                  <div class="detail">
+                    <h3>交易方式</h3>
+                    <div class="transaction-method" v-if="good.transaction_method === 0">
+                      <span>其他方式：</span>
+                      <span>与卖家商讨</span>
+                    </div>
+                    <div class="transaction-method" v-if="good.transaction_method === 1">
+                      <span>买家自提：</span>
+                      <span>买家至卖家处自提（需要与卖家商量好时间）</span>
+                    </div>
+                    <div class="transaction-method" v-if="good.transaction_method === 1">
+                      <span>自提地址：</span>
+                      <span>{{ good.seller_address }}</span>
+                    </div>
+                    <div class="transaction-method" v-if="good.transaction_method === 2">
+                      <span>快递邮寄：</span>
+                      <span>卖家通过快递、闪送等寄件至以上所填地址</span>
+                    </div>
+                    <div class="transaction-method" v-if="good.transaction_method === 3">
+                      <span>送货上门：</span>
+                      <span>卖家亲自将物品送至以上所填地址</span>
+                    </div>
+                    <div class="transaction-method" v-if="good.transaction_method === 4">
+                      <span>当面交易：</span>
+                      <span>卖家与买家自行商讨时间地点进行交易</span>
+                    </div>
+                    <div class="transaction-method" v-if="good.transaction_method === 5">
+                      <span>虚拟商品：</span>
+                      <span>虚拟商品无需配送</span>
+                    </div>
+                  </div>
                   <div class="detail">
                     <h3>详细说明</h3>
                     <p>{{ good.detail }}</p>
@@ -145,7 +215,8 @@ onMounted(() => {
             <div class="goods-aside">
               <div class="goods-hot">
                 <h3>同类好物</h3>
-                <GoodItem v-for="good in (categoryData.goods||[]).slice(0, 16)" :good="good" :key="good.id"></GoodItem>
+                <GoodItem v-for="good in (categoryData.goods || []).slice(0, 16)" :good="good" :key="good.id">
+                </GoodItem>
               </div>
             </div>
           </div>
@@ -153,7 +224,7 @@ onMounted(() => {
       </div>
     </div>
     <div v-else>
-      <p>当前页面不存在或商品已售出，请返回首页</p>
+      <el-empty description="当前商品已被删除或商品已售出，请返回" />
     </div>
   </div>
 </template>
@@ -193,7 +264,7 @@ onMounted(() => {
     }
   }
 
-.number-box {
+  .number-box {
     display: flex;
     align-items: center;
 
@@ -382,6 +453,15 @@ onMounted(() => {
       margin-bottom: 30px;
 
       p {
+        margin-top: 10px;
+        color: #666;
+        line-height: 1.8;
+        word-wrap: break-word;
+        word-break: break-all;
+      }
+
+      .transaction-method {
+        margin-top: 10px;
         color: #666;
         line-height: 1.8;
         word-wrap: break-word;
@@ -421,7 +501,7 @@ onMounted(() => {
   }
 
   .btn {
-    margin-top: 20px;
+    margin-top: 80px;
   }
 
   .bread-container {
@@ -429,7 +509,8 @@ onMounted(() => {
   }
 
   .goods-hot {
-    background: white; 
+    background: white;
+
     h3 {
       height: 70px;
       background: $helpColor;

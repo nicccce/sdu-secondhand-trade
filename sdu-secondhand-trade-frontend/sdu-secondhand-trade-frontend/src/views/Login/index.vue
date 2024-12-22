@@ -68,7 +68,7 @@ const userStore = useUserStore()
 const formRef = ref(null)
 const router = useRouter()
 const doLogin = () => {
-    const { student_id, password } = form.value;
+    const { student_id, password } = form.value
     formRef.value.validate(async (valid) => {
         if (valid) {
             try {
@@ -78,9 +78,9 @@ const doLogin = () => {
                     message: '登录成功'
                 });
                 router.replace({ path: '/' });  // 跳转到首页
-            } catch (error) {}
+            } catch (error) { }
         }
-    });
+    })
 }
 
 </script>
@@ -114,7 +114,7 @@ const doLogin = () => {
                                 <el-input v-model="form.student_id" />
                             </el-form-item>
                             <el-form-item prop="password" label="密码">
-                                <el-input v-model="form.password" />
+                                <el-input type="password" v-model="form.password" />
                             </el-form-item>
                             <el-form-item prop="agree" label-width="22px">
                                 <el-checkbox size="large" v-model="form.agree">

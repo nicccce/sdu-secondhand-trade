@@ -64,7 +64,6 @@ const backgroundSize = ref("1000px 1000px")
 const setLargeImageStyle = (imageSrc) => {
     const img = new Image();
     img.src = imageSrc;
-    console.log(666)
 
     img.onload = () => {
         const imgWidth = img.width;

@@ -4,9 +4,11 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import 'element-plus/theme-chalk/el-message.css'
 
+export const baseURL = 'http://127.0.0.1:4523/m1/5399366-0-default'
+
 // 创建axios实例
 const httpInstance = axios.create({
-  baseURL: 'http://127.0.0.1:4523/m1/5399366-0-default',
+  baseURL: baseURL,
   timeout: 5000
 })
 
@@ -39,6 +41,10 @@ httpInstance.interceptors.response.use(res => {
   const userStore = useUserStore()
   // 处理请求错误
   if (e.response.status === 401) {
+    ElMessage({
+      type: 'warning',
+      message: '请先登录！'
+    })
     userStore.clearUserInfo()
     router.push('/login')
   } else if (e.response) {

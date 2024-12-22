@@ -22,7 +22,9 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     AutoImport({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver({
+        importStyle: 'sass'
+      })],
     }),
     Components({
       resolvers: [ElementPlusResolver({

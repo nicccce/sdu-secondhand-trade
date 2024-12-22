@@ -33,7 +33,7 @@ const reqData = ref({
   category_id: route.params.id,
   page: 1,
   page_size: 20,
-  sort_field: 'publish_time'
+  sort_field: 'time'
 })
 const getGoodList = async () => {
   let res = await getSubCategoryAPI(reqData.value)
@@ -44,8 +44,10 @@ onMounted(() => {
   getGoodList()
 })
 
+const sortFieldList=['time','campus']
 // tab切换
-const tabChange = () => {
+const tabChange = (tabId) => {
+  reqData.value.sort_field = tabId
   reqData.page = 1
   getGoodList()
 }
@@ -76,7 +78,7 @@ const load = async () => {
 
     <div class="sub-container">
       <el-tabs v-model="reqData.sort_field" @tab-change="tabChange">
-        <el-tab-pane label="最新商品" name="publishTime"></el-tab-pane>
+        <el-tab-pane label="最新商品" name="time"></el-tab-pane>
         <el-tab-pane label="我的校区" name="campus"></el-tab-pane>
       </el-tabs>
 
@@ -85,6 +87,9 @@ const load = async () => {
         <GoodItem v-for="good in goodList" :good="good" :key="good.id"></GoodItem>
       </div>
     </div>
+  </div>
+  <div v-else>
+    <el-empty description="暂无商品数据" />
   </div>
 </template>
 

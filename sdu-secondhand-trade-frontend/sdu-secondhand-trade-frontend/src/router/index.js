@@ -5,6 +5,17 @@ import Home from '@/views/Home/index.vue'
 import Category from '@/views/Category/index.vue'
 import SubCategory from '@/views/SubCategory/index.vue'
 import Detail from '@/views/Detail/index.vue'
+import Order from '@/views/Order/index.vue'
+import Pay from '@/views/Pay/index.vue'
+import PayBack from '@/views/Pay/PayBack.vue'
+import User from '@/views/User/index.vue'
+import UserInfo from '@/views/User/components/UserInfo.vue'
+import UserBuyOrder from '@/views/User/components/UserBuyOrder.vue'
+import UserSellOrder from '@/views/User/components/UserSellOrder.vue'
+import Sell from '@/views/Sell/index.vue'
+import UserGood from '@/views/User/components/UserGood.vue'
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,6 +42,53 @@ const router = createRouter({
           path: 'detail/:id',
           name: 'detail',
           component: Detail
+        },
+        {
+          path: 'order/:id',
+          name: 'order',
+          component: Order
+        },
+        {
+          path: 'pay/:id',
+          name: 'pay',
+          component: Pay
+        },
+        {
+          path: 'pay/callback/:id',
+          name: 'payBack',
+          component: PayBack,
+        },
+        {
+          path: 'user',
+          name: 'user',
+          component: User,
+          children: [
+            {
+              path: '',
+              name: 'info',
+              component: UserInfo,
+            },
+            {
+              path: 'buyer_order',
+              name: 'buyer_order',
+              component: UserBuyOrder,
+            },
+            {
+              path: 'seller_order',
+              name: 'seller_order',
+              component: UserSellOrder,
+            },
+            {
+              path: 'good',
+              name: 'good',
+              component: UserGood,
+            }
+          ]
+        },
+        {
+          path: 'sell',
+          name: 'sell',
+          component: Sell,
         }
       ]
     },

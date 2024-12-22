@@ -73,8 +73,8 @@ onMounted(() => {
 
     <!-- 加载中状态 -->
     <div v-else>
-        <p>加载中...</p>
-    </div>
+    <el-empty description="暂无商品数据" />
+  </div>
 </template>
 
 

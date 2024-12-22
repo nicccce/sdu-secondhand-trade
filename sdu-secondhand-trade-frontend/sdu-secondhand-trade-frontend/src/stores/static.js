@@ -6,6 +6,23 @@ export const useStaticStore = defineStore('static', () => {
     const genderList = ref([])
     const campusList = ref([])
 
+    const getTransactionMethod = (type) => {
+        switch (type) {
+            case 1:
+                return '买家自提';
+            case 2:
+                return '快递邮寄';
+            case 3:
+                return '送货上门';
+            case 4:
+                return '当面交易';
+            case 5:
+                return '虚拟商品';
+            default:
+                return '其他'; // 默认返回其他
+        }
+    }
+
     // 获取性别列表
     const getGenderList = async () => {
         try {
@@ -29,6 +46,7 @@ export const useStaticStore = defineStore('static', () => {
         genderList,
         campusList,
         getGenderList,
-        getCampusList
+        getCampusList,
+        getTransactionMethod,
     }
 })
