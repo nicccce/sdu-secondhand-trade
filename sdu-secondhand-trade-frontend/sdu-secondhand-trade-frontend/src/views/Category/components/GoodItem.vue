@@ -29,6 +29,7 @@ const staticStore = useStaticStore()
 .goods-item {
   display: block;
   width: 270px;
+  height: 350px;
   padding: 25px 49px;
   text-align: center;
   transition: all .5s;

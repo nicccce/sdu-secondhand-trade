@@ -54,3 +54,15 @@ export const updatePasswordAPI = (data)=>httpInstance({
     method: 'POST',
     data
 })
+
+export const registerAPI = (data)=>httpInstance({
+    url:'/user/register',
+    method: 'POST',
+    data
+})
+
+export const forgetAPI = (data)=>httpInstance({
+    url:'/user/forget',
+    method: 'POST',
+    data
+})

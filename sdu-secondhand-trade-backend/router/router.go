@@ -58,7 +58,6 @@ func Setup(engine *gin.Engine) {
 	}
 
 	static := engine.Group("/static")
-	static.Use(middleware.JWT(1))
 	{
 		service := service.UserService{}
 		static.GET("/gender", service.GetAllGender)

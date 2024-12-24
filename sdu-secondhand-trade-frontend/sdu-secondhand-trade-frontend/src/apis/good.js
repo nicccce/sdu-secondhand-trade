@@ -15,19 +15,25 @@ export const addGoodAPI = (data) => {
     })
 }
 
-export const getMyGoodAPI = (data) =>httpInstance({
+export const getMyGoodAPI = (data) => httpInstance({
     url: '/good/my',
-    method:'POST',
+    method: 'POST',
     data
 })
 
-export const getAllGoodAPI = (data) =>httpInstance({
+export const getAllGoodAPI = (data) => httpInstance({
     url: '/good/all',
-    method:'POST',
+    method: 'POST',
     data
 })
 
-export const deleteGoodAPI = (id) =>httpInstance({
+export const deleteGoodAPI = (id) => httpInstance({
     url: `/good/${id}`,
-    method:'DELETE'
+    method: 'DELETE'
+})
+
+export const searchGoodAPI = (name) => httpInstance({
+    url: `/good/search`,
+    method: 'GET',
+    params: { name }
 })

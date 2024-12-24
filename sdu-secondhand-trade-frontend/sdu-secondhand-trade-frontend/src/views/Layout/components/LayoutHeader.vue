@@ -1,7 +1,18 @@
 <script setup>
 import { useCategoryStore } from '@/stores/category';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const categoryStore = useCategoryStore()
+const router = useRouter()
+
+const search = ref("")
+const handleSearch = ()=>{
+  if(search.value === ""){
+    return
+  }
+  router.push({path : `/good/search/${search.value}`})
+}
 
 </script>
 
@@ -21,7 +32,7 @@ const categoryStore = useCategoryStore()
       </ul>
       <div class="search">
         <i class="iconfont icon-search"></i>
-        <input type="text" placeholder="搜一搜">
+        <input type="text" v-model="search" placeholder="搜一搜" @keydown.enter="handleSearch">
       </div>
     </div>
   </header>

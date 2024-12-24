@@ -18,6 +18,7 @@ import UserAfterSale from '@/views/User/components/UserAfterSale.vue'
 import AdminUser from '@/views/User/components/AdminUser.vue'
 import AdminGood from '@/views/User/components/AdminGood.vue'
 import AdminAfterSale from '@/views/User/components/AdminAfterSale.vue'
+import About from '@/views/About/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -119,6 +120,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: Login
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: About
     }
   ],
   scrollBehavior() {

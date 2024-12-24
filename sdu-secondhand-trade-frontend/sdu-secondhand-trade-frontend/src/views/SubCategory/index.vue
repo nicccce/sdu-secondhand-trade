@@ -52,15 +52,19 @@ const tabChange = (tabId) => {
   getGoodList()
 }
 
+const disabled = ref(false)
 
 const load = async () => {
+  if(disabled.value){
+    return
+  }
   reqData.value.page++
   const res = await getSubCategoryAPI(reqData.value)
-  goodList.value = [...goodList.value, ...res.data]
-  // 加载完毕 停止监听
-  if (res.data.length === 0) {
+  if (res.data == null || res.data.length === 0) {
     disabled.value = true
   }
+  goodList.value = [...goodList.value, ...res.data]
+  // 加载完毕 停止监听
 }
 </script>
 

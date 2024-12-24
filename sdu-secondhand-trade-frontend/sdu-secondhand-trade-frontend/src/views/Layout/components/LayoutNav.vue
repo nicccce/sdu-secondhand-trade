@@ -26,11 +26,12 @@ const confirm = () => {
           </li>
           <li><a href="javascript:;" @click="router.push('/user/buyer_order')">我的订单</a></li>
           <li><a href="javascript:;" @click="router.push('/user')">个人中心</a></li>
+          <li><a href="javascript:;" @click="$router.push('/about')">关于我们</a></li>
         </template>
         <template v-else>
           <li><a href="javascript:;" @click="$router.push('/login')">请先登录</a></li>
           <li><a href="javascript:;">帮助中心</a></li>
-          <li><a href="javascript:;">关于我们</a></li>
+          <li><a href="javascript:;" @click="$router.push('/about')">关于我们</a></li>
         </template>
       </ul>
     </div>

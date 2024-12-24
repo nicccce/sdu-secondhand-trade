@@ -40,13 +40,50 @@ export const useCountDown = () => {
         }, 1000)
     }
 
+    const formatSecond = computed(() => {
+        const seconds = time.value % 60
+        return `${String(seconds).padStart(2, '0')}`
+    })
+    const start1m = () => {
+        // 将目标时间转为 Unix 时间戳（秒）
+        const targetDate = dayjs().add(1, 'minute')
+        const currentTime = dayjs()
+
+        // 计算倒计时秒数（目标时间 - 当前时间）
+        time.value = targetDate.diff(currentTime, 'second')
+
+        // 判断是否倒计时结束
+        if (time.value <= 0) {
+            time.value = 0
+            return
+        }
+
+        // 每隔1秒更新一次
+        timer = setInterval(() => {
+            time.value--
+
+            // 如果倒计时结束，清除定时器
+            if (time.value <= 0) {
+                clearInterval(timer)
+                time.value = 0
+            }
+        }, 1000)
+    }
+
     // 组件销毁时清除定时器
     onUnmounted(() => {
         timer && clearInterval(timer)
     })
 
+    const reset = () => {
+        time.value = 0;
+    }
+
     return {
         formatTime,
-        start
+        start,
+        start1m,
+        formatSecond,
+        reset
     }
 }

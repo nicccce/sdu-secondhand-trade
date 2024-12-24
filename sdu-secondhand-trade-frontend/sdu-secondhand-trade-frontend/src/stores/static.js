@@ -37,9 +37,6 @@ export const useStaticStore = defineStore('static', () => {
         try {
             const res = await getCampusAPI()
             campusList.value = res.data
-            for(let campus in campusList.value){
-                campus.id = parseInt(campus.id)
-            }
         } catch (error) {
             console.error('初始化校区信息失败:', error)
         }
