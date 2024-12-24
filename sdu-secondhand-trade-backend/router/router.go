@@ -34,6 +34,7 @@ func Setup(engine *gin.Engine) {
 		user.GET("/test_get_jwt", service.TestGetJWT)
 		user.POST("/login", service.Login)
 		user.POST("/register", service.Register)
+		user.POST("/forget", service.Forget)
 	}
 	user.Use(middleware.JWT(1))
 	{
@@ -76,6 +77,7 @@ func Setup(engine *gin.Engine) {
 		good.POST("/all", service.GetAllGoods)
 		good.POST("/cover/:good_id", service.UpdateGoodCover)
 		good.POST("/picture/:good_id", service.UpdateGoodPictures)
+		good.GET("/search", service.GetSearchGoods)
 	}
 	good.Use(middleware.JWT(1))
 	{

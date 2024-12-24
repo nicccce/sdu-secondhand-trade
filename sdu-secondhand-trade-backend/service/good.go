@@ -494,3 +494,16 @@ func (receiver GoodService) GetMyGood(c *gin.Context) {
 	aw.Success(goodLL)
 
 }
+
+func (receiver GoodService) GetSearchGoods(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	search := c.Query("name")
+	goods, err := goodModel.GetSearchGoods(search)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+
+	aw.Success(goods)
+
+}

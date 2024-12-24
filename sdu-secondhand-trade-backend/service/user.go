@@ -86,6 +86,8 @@ func (receiver UserService) Register(c *gin.Context) {
 		Password  string `form:"password" json:"password" binding:"required"`
 		StudentID string `form:"student_id" json:"student_id" binding:"required"`
 		Nickname  string `form:"nickname" json:"nickname" binding:"required"`
+		Phone     string `form:"phone" json:"phone" binding:"required"`
+		Code      string `form:"code" json:"code" binding:"required"`
 	}
 	var req registerReq
 	if err := c.ShouldBind(&req); err != nil {
@@ -93,14 +95,23 @@ func (receiver UserService) Register(c *gin.Context) {
 		return
 	}
 	pattern := `^202\d{9}$`
-	regexp := regexp.MustCompile(pattern)
-	if !regexp.MatchString(req.StudentID) {
+	reg := regexp.MustCompile(pattern)
+	if !reg.MatchString(req.StudentID) {
 		aw.Error("学号不合法")
 		return
 	}
 	user := userModel.FindUserByStudentID(req.StudentID)
 	if user != nil {
 		aw.Error("账号已被注册")
+		return
+	}
+	re := regexp.MustCompile(`^\d{11}$`)
+	if !re.MatchString(req.Phone) {
+		aw.Error("电话需11位")
+		return
+	}
+	if req.Code != "1234" {
+		aw.Error("验证码错误")
 		return
 	}
 	encryptPassword, err := util.EncryptPassword(req.Password)
@@ -114,11 +125,62 @@ func (receiver UserService) Register(c *gin.Context) {
 		StudentID: req.StudentID,
 		UserInfo: model.UserInfo{
 			Nickname: req.Nickname,
+			Phone:    req.Phone,
 		},
 	}
 	userModel.CreateUser(user)
 	aw.OK()
 }
+
+func (receiver UserService) Forget(c *gin.Context) {
+	aw := app.NewWrapper(c)
+	type ForgetReq struct {
+		Password  string `form:"password" json:"password" binding:"required"`
+		StudentID string `form:"student_id" json:"student_id" binding:"required"`
+		Phone     string `form:"phone" json:"phone" binding:"required"`
+		Code      string `form:"code" json:"code" binding:"required"`
+	}
+	var req ForgetReq
+	if err := c.ShouldBind(&req); err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	pattern := `^202\d{9}$`
+	reg := regexp.MustCompile(pattern)
+	if !reg.MatchString(req.StudentID) {
+		aw.Error("学号不合法")
+		return
+	}
+	user := userModel.FindUserByStudentID(req.StudentID)
+	if user == nil {
+		aw.Error("账号未被注册")
+		return
+	}
+	re := regexp.MustCompile(`^\d{11}$`)
+	if !re.MatchString(req.Phone) {
+		aw.Error("电话需11位")
+		return
+	}
+	if user.Phone != req.Phone {
+		aw.Error("电话不正确")
+		return
+	}
+	if req.Code != "1234" {
+		aw.Error("验证码错误")
+		return
+	}
+	encryptPassword, err := util.EncryptPassword(req.Password)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	user = &model.User{
+		Password: encryptPassword,
+	}
+	userModel.UpdateUser(user)
+	aw.OK()
+}
+
 func (receiver UserService) Me(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	userClaims := util.ExtractUserClaims(c)
