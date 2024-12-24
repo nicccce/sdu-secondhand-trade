@@ -4,7 +4,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import 'element-plus/theme-chalk/el-message.css'
 
-export const baseURL = 'http://127.0.0.1:4523/m1/5399366-0-default'
+export const baseURL = 'http://47.98.214.174:8081'
 
 // 创建axios实例
 const httpInstance = axios.create({

@@ -10,7 +10,7 @@ const good = ref({})
 const route = useRoute()
 const router = useRouter()
 const getOderInfo = async () => {
-    const res = await getOrderAPI(route.params.id)
+    const res = await getOrderAPI(parseInt(route.params.id))
     orderInfo.value = res.data
 }
 
@@ -43,8 +43,8 @@ onMounted(async () => {
                     <span v-else>其他方式</span></p>
                 <p>交易金额：<span>¥{{ parseFloat(good.price).toFixed(2) }}</span></p>
                 <div class="btn">
-                    <el-button type="primary" style="margin-right:20px">查看订单</el-button>
-                    <el-button>进入首页</el-button>
+                    <el-button type="primary" style="margin-right:20px" @click="router.push({path : `/order/${orderInfo.id}`})">查看订单</el-button>
+                    <el-button @click="router.push({path : `/`})">进入首页</el-button>
                 </div>
                 <p class="alert">
                     <span class="iconfont icon-tip"></span>

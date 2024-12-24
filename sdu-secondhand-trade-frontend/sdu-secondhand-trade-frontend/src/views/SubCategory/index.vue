@@ -30,7 +30,7 @@ const categoryData = computed(() => {
 //获取商品数据
 const goodList = ref([])
 const reqData = ref({
-  category_id: route.params.id,
+  category_id: parseInt(route.params.id),
   page: 1,
   page_size: 20,
   sort_field: 'time'

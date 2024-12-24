@@ -149,7 +149,7 @@ func (receiver *OrderService) SubmitOrder(c *gin.Context) {
 	// 提交订单，更新订单状态为待支付（1）
 	order.Status = new(int)
 	*order.Status = 1
-	if order.Payment == 2 || order.Payment == 3 {
+	if req.Payment == 2 || req.Payment == 3 {
 		*order.Status = 2
 	}
 	order.Payment = req.Payment
@@ -161,18 +161,6 @@ func (receiver *OrderService) SubmitOrder(c *gin.Context) {
 	// 更新订单信息
 	if err := orderModel.UpdateOrder(order); err != nil {
 		aw.Error("提交订单失败: " + err.Error())
-		return
-	}
-
-	// 提交时，恢复商品为有效
-	good, err := goodModel.GetGoodByID(order.GoodId)
-	if err != nil {
-		aw.Error("获取商品失败: " + err.Error())
-		return
-	}
-	good.IsEffective = true
-	if err := goodModel.UpdateGood(&good); err != nil {
-		aw.Error("更新商品状态失败: " + err.Error())
 		return
 	}
 
@@ -286,7 +274,7 @@ func (receiver *OrderService) GetOrder(c *gin.Context) {
 
 type OrderVo struct {
 	Total int           `json:"total"`
-	LL    []model.Order `json:"order"`
+	LL    []model.Order `json:"orders"`
 }
 
 func (receiver *OrderService) GetBuyerOrder(c *gin.Context) {

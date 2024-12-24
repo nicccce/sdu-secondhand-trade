@@ -10,7 +10,7 @@ import { initOrderAPI } from '@/apis/order';
 const good = ref({})
 const route = useRoute()
 const getGood = async () => {
-  const res = await getGoodDetailAPI(route.params.id)
+  const res = await getGoodDetailAPI(parseInt(route.params.id))
   good.value = res.data
   if (!good.value.is_effective) {
     showErrorMessage()
@@ -68,7 +68,7 @@ const buy = async () => {
   try {
     const res = await initOrderAPI(good.value.id)
     if (res.code === 0) {
-      router.push(`/order/${res.data.order_id}`)
+      router.push(`/order/${res.data}`)
     }
   } catch {
     showErrorMessage()

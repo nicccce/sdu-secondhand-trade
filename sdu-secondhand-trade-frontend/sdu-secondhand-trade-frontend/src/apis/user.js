@@ -23,7 +23,7 @@ export const updateUserAPI = (data)=>httpInstance({
 })
 
 export const addAddressAPI = (data) => httpInstance({
-    url: '/user/address',
+    url: '/user/address/',
     method: 'POST',
     data
 })
@@ -45,7 +45,7 @@ export const getUserByIdAPI = (id) => httpInstance({
 })
 
 export const getAllUsersAPI = () =>httpInstance({
-    url: `/user`,
+    url: `/user/`,
     method: 'GET'
 })
 

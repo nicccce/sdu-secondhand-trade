@@ -17,38 +17,6 @@ type AlipayService struct{}
 
 var client *alipay.Client
 
-func init() {
-	var err error
-	kAppId := conf.Conf.KAppId
-	kPrivateKey := conf.Conf.KPrivateKey
-	//支付宝提供了用于开发时测试的 sandbox 环境，对接的时候需要注意相关的 app id 和密钥是 sandbox 环境还是 production 环境的。如果是 sandbox 环境，本参数应该传 false，否则为 true。
-	if client, err = alipay.New(kAppId, kPrivateKey, false); err != nil {
-		log.Println("初始化支付宝失败", err)
-		return
-	}
-
-	// 加载证书
-	// 加载应用公钥证书
-	if err = client.LoadAppCertPublicKeyFromFile("./cert/appPublicCert.crt"); err != nil {
-		log.Println("加载证书发生错误", err)
-		return
-	}
-	// 加载支付宝根证书
-	if err = client.LoadAliPayRootCertFromFile("./cert/alipayRootCert.crt"); err != nil {
-		log.Println("加载证书发生错误", err)
-		return
-	}
-	// 加载支付宝公钥证书
-	if err = client.LoadAlipayCertPublicKeyFromFile("./cert/alipayPublicCert.crt"); err != nil {
-		log.Println("加载证书发生错误", err)
-		return
-	}
-	//接口内容加密
-	//	if err = client.SetEncryptKey("iotxR/d99T9Awom/UaSqiQ=="); err != nil {
-	log.Println("加载内容加密密钥发生错误", err)
-	return
-}
-
 func (receiver AlipayService) Pay(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	var orderId int
@@ -72,7 +40,7 @@ func (receiver AlipayService) Pay(c *gin.Context) {
 	}
 	kServerDomain := conf.Conf.KServerDomain
 	var p = alipay.TradePagePay{}
-	p.NotifyURL = kServerDomain + "/alipay/notify/" + strconv.Itoa(orderId)
+	p.NotifyURL = kServerDomain + "/pay/alipay/notify/" + strconv.Itoa(orderId)
 	p.ReturnURL = redirect
 	p.Subject = "支付测试:" + tradeNo
 	p.OutTradeNo = tradeNo
@@ -171,6 +139,14 @@ func (receiver AlipayService) Notify(c *gin.Context) {
 	}
 	*order.Status = 2
 	orderModel.UpdateOrder(order)
+
+	good, err := goodModel.GetGoodByID(order.GoodId)
+	if err != nil {
+		aw.Error(err.Error())
+		return
+	}
+	good.IsEffective = false
+	goodModel.UpdateGood(&good)
 	log.Printf("订单 %s 支付成功", notification.OutTradeNo)
 
 	client.ACKNotification(c.Writer)

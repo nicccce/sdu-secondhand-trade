@@ -61,13 +61,12 @@ func (receiver *OrderModel) GetOrdersByBuyerIDAndStatus(buyerID, status, page, p
 	query := receiver.Tx.Where("buyer_id = ? AND status = ?", buyerID, status).
 		Limit(pageSize).Offset(offset) // 设置分页条件
 
-	// 执行查询
-	if err := query.Find(&orders).Error; err != nil {
-		return nil, 0, err
-	}
-
 	// 查询符合条件的总订单数
 	if err := receiver.Tx.Model(&Order{}).Where("buyer_id = ? AND status = ?", buyerID, status).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	// 执行查询
+	if err := query.Find(&orders).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -84,13 +83,12 @@ func (receiver *OrderModel) GetOrdersBySellerIDAndStatus(goodID, status, page, p
 	query := receiver.Tx.Where("good_id = ? AND status = ?", goodID, status).
 		Limit(pageSize).Offset(offset) // 设置分页条件
 
-	// 执行查询
-	if err := query.Find(&orders).Error; err != nil {
-		return nil, 0, err
-	}
-
 	// 查询符合条件的总订单数
 	if err := receiver.Tx.Model(&Order{}).Where("good_id = ? AND status = ?", goodID, status).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	// 执行查询
+	if err := query.Find(&orders).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -116,13 +114,12 @@ func (receiver *OrderModel) GetOrdersByBuyerID(buyerID, page, pageSize int) ([]O
 	query := receiver.Tx.Where("buyer_id = ? ", buyerID).
 		Limit(pageSize).Offset(offset) // 设置分页条件
 
-	// 执行查询，获取订单列表
-	if err := query.Find(&orders).Error; err != nil {
-		return nil, 0, err
-	}
-
 	// 查询符合条件的总订单数
 	if err := receiver.Tx.Model(&Order{}).Where("buyer_id = ?", buyerID).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	// 执行查询，获取订单列表
+	if err := query.Find(&orders).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -139,13 +136,12 @@ func (receiver *OrderModel) GetOrdersByGoodID(goodID, page, pageSize int) ([]Ord
 	query := receiver.Tx.Where("good_id = ? ", goodID).
 		Limit(pageSize).Offset(offset) // 设置分页条件
 
-	// 执行查询，获取订单列表
-	if err := query.Find(&orders).Error; err != nil {
-		return nil, 0, err
-	}
-
 	// 查询符合条件的总订单数
 	if err := receiver.Tx.Model(&Order{}).Where("good_id = ? ", goodID).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	// 执行查询，获取订单列表
+	if err := query.Find(&orders).Error; err != nil {
 		return nil, 0, err
 	}
 

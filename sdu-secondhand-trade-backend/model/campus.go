@@ -3,7 +3,7 @@ package model
 import "sdu-secondhand-trade-backend/util"
 
 type Campus struct {
-	ID   string `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 type CampusModel struct {

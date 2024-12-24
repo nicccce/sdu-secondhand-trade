@@ -207,7 +207,7 @@ func (receiver GoodService) GetUnfinishedGoodsByCampus(c *gin.Context) {
 	type GetUnfinishedGoodsReq struct {
 		CategoryID int `json:"category_id" binding:"required"`
 		Page       int `json:"page" binding:"required,min=1"`
-		PageSize   int `json:"page-size" binding:"required,min=1"`
+		PageSize   int `json:"page_size" binding:"required,min=1"`
 	}
 
 	var req GetUnfinishedGoodsReq
@@ -251,7 +251,7 @@ func (receiver GoodService) CreateGood(c *gin.Context) {
 	}
 	req.Seller = userClaim.UserID
 	goodModel.CreateGood(&req.Good)
-	aw.OK()
+	aw.Success(gin.H{"id": req.Good.ID})
 }
 
 func (receiver GoodService) UpdateGoodCover(c *gin.Context) {
@@ -273,7 +273,7 @@ func (receiver GoodService) UpdateGoodCover(c *gin.Context) {
 	}
 
 	// 获取前端上传的文件，字段名为"cover"
-	file, err := c.FormFile("cover")
+	file, err := c.FormFile("file")
 	if err != nil {
 		aw.Error("文件上传失败: " + err.Error())
 		return
@@ -298,10 +298,10 @@ func (receiver GoodService) UpdateGoodCover(c *gin.Context) {
 	newFileName := strconv.FormatInt(timestamp, 10) + ext
 
 	// 文件存储路径（项目根目录下的 "cover" 文件夹）
-	savePath := "../cover/" + newFileName
+	savePath := "./static/cover/" + newFileName
 
 	// 确保文件夹存在
-	if err := os.MkdirAll("../cover", os.ModePerm); err != nil {
+	if err := os.MkdirAll("./static/cover/", os.ModePerm); err != nil {
 		aw.Error("无法创建文件夹: " + err.Error())
 		return
 	}
@@ -313,7 +313,7 @@ func (receiver GoodService) UpdateGoodCover(c *gin.Context) {
 	}
 
 	// 将文件路径赋值给good对象的cover字段
-	good.Cover = savePath
+	good.Cover = "http://47.98.214.174:8083/static/cover/" + newFileName
 
 	//判断
 	pictures := picturesModel.FindPicturesByGoodID(goodId)
@@ -349,7 +349,7 @@ func (receiver GoodService) UpdateGoodPictures(c *gin.Context) {
 		return
 	}
 	// 获取前端上传的文件，字段名为"picture"
-	file, err := c.FormFile("picture")
+	file, err := c.FormFile("file")
 	if err != nil {
 		aw.Error("文件上传失败: " + err.Error())
 		return
@@ -374,10 +374,10 @@ func (receiver GoodService) UpdateGoodPictures(c *gin.Context) {
 	newFileName := strconv.FormatInt(timestamp, 10) + ext
 
 	// 文件存储路径（项目根目录下的 "cover" 文件夹）
-	savePath := "../pictures/" + newFileName
+	savePath := "./static/pictures/" + newFileName
 
 	// 确保文件夹存在
-	if err := os.MkdirAll("../pictures", os.ModePerm); err != nil {
+	if err := os.MkdirAll("./static/pictures/", os.ModePerm); err != nil {
 		aw.Error("无法创建文件夹: " + err.Error())
 		return
 	}
@@ -389,7 +389,7 @@ func (receiver GoodService) UpdateGoodPictures(c *gin.Context) {
 	}
 
 	picture := &model.Pictures{
-		URL:    savePath,
+		URL:    "http://47.98.214.174:8083/static/pictures/" + newFileName,
 		GoodId: goodId,
 	}
 	picturesModel.CreatePicture(picture)

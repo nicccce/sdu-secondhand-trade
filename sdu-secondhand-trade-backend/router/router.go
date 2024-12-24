@@ -75,6 +75,8 @@ func Setup(engine *gin.Engine) {
 		good.GET("/campus/:campus_id", service.GetGoodsByCampus)
 		good.POST("/temporary/time", service.GetUnfinishedGoodsByTime)
 		good.POST("/all", service.GetAllGoods)
+		good.POST("/cover/:good_id", service.UpdateGoodCover)
+		good.POST("/picture/:good_id", service.UpdateGoodPictures)
 	}
 	good.Use(middleware.JWT(1))
 	{
@@ -82,8 +84,6 @@ func Setup(engine *gin.Engine) {
 		good.GET("/:id", service.GetGoodsDetailed)
 		good.POST("/temporary/campus", service.GetUnfinishedGoodsByCampus)
 		good.POST("/sell", service.CreateGood)
-		good.POST("/cover/:good_id", service.UpdateGoodCover)
-		good.POST("/picture/:good_id", service.UpdateGoodPictures)
 		good.DELETE("/:id", service.DeleteGood)
 		good.POST("/my", service.GetMyGood)
 	}
@@ -116,12 +116,11 @@ func Setup(engine *gin.Engine) {
 	}
 
 	r := engine.Group("/pay")
-	r.Use(middleware.JWT(1))
 	{
 		service := service.AlipayService{}
 		r.GET("/alipay", service.Pay)
 		r.GET("/alipay/callback", service.Callback)
-		r.GET("/alipay/notify/:order_id", service.Notify)
+		r.POST("/alipay/notify/:order_id", service.Notify)
 	}
 
 }

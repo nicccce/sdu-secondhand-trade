@@ -3,3 +3,4 @@
 /sdu-secondhand-trade-backend.exe
 .idea
 /cert
+.env

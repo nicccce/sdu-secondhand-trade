@@ -177,8 +177,8 @@ func (receiver UserService) UpdatePassword(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	userClaim := util.ExtractUserClaims(c)
 	type updateReq struct {
-		oldPassword string `json:"old_password" binding:"required"`
-		newPassword string `json:"new_password" binding:"required"`
+		OldPassword string `json:"old_password" binding:"required"`
+		NewPassword string `json:"new_password" binding:"required"`
 	}
 	var req updateReq
 	if err := c.ShouldBind(&req); err != nil {
@@ -193,11 +193,11 @@ func (receiver UserService) UpdatePassword(c *gin.Context) {
 		aw.Error("用户名不存在")
 		return
 	}
-	if !util.CheckPassword(req.oldPassword, user.Password) {
+	if !util.CheckPassword(req.OldPassword, user.Password) {
 		aw.Error("旧密码错误")
 		return
 	}
-	encryptPassword, err := util.EncryptPassword(req.newPassword)
+	encryptPassword, err := util.EncryptPassword(req.NewPassword)
 	if err != nil {
 		aw.Error(err.Error())
 		return
@@ -216,7 +216,9 @@ func (receiver UserService) CreateAddress(c *gin.Context) {
 	aw := app.NewWrapper(c)
 	userClaim := util.ExtractUserClaims(c)
 	type updateReq struct {
-		Address string `json:"address" binding:"required"`
+		Address  string `json:"address" binding:"required"`
+		Contact  string `json:"contact" binding:"required"`
+		Receiver string `json:"receiver" binding:"required"`
 	}
 	var req updateReq
 	if err := c.ShouldBind(&req); err != nil {
@@ -224,8 +226,10 @@ func (receiver UserService) CreateAddress(c *gin.Context) {
 		return
 	}
 	newAddress := &model.Address{
-		Address: req.Address,
-		UserID:  userClaim.UserID,
+		Address:  req.Address,
+		UserID:   userClaim.UserID,
+		Receiver: req.Receiver,
+		Contact:  req.Contact,
 	}
 	addressModel.CreateAddress(newAddress)
 	aw.OK()
@@ -326,8 +330,16 @@ func (receiver UserService) UpdateUser(c *gin.Context) {
 
 func (receiver UserService) GetAllGender(c *gin.Context) {
 	aw := app.NewWrapper(c)
-	users := userModel.GetAllUserGenders()
-	aw.Success(users)
+	aw.Success([]gin.H{
+		{
+			"id":   1,
+			"name": "男",
+		},
+		{
+			"id":   2,
+			"name": "女",
+		},
+	})
 }
 
 func (receiver UserService) GetAllCampus(c *gin.Context) {

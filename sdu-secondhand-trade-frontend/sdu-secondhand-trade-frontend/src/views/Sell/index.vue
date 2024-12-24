@@ -22,7 +22,7 @@ const good = ref({
     name: "", // 商品名称
     description: "", // 商品描述
     price: "", // 商品价格
-    campus: userStore.userInfo.campus, // 校区信息
+    campus: userStore.userInfo.campus||null, // 校区信息
     category: null, // 商品分类
     brand: "", // 品牌
     status: "", // 商品状态（如 9 成新）
@@ -127,6 +127,7 @@ const submitGood = () => {
     goodRef.value.validate(async (valid) => {
         if (valid) {
             try {
+                good.value.price = parseInt(good.value.price)
                 const res = await addGoodAPI(good.value)
                 if (res.code === 0) {
                     good.value.id = res.data.id
@@ -139,7 +140,6 @@ const submitGood = () => {
             } catch (error) { }
         }
     });
-    console.log(good.value);
 
 };
 
@@ -310,7 +310,7 @@ onMounted(()=>{
                             </el-icon>
                         </el-upload>
                         <h3 class="box-title">商品图片</h3>
-                        <el-upload v-model:file-list="pictureList" :action="uploadUrl" list-type="picture-card"
+                        <el-upload v-model:file-list="pictureList" :action="`${baseURL}/good/picture/${good.id}`" list-type="picture-card"
                             :on-preview="handlePictureCardPreview" :before-upload="beforePictureUpload"
                             :on-success="handlePictureSuccess" :show-remove="false" :on-remove="!1===1" accept="image/*">
                             <el-icon>

@@ -234,14 +234,13 @@ func (receiver GoodModel) GetAllGoods(isEffective int, page int, pageSize int, s
 	if isEffective != -1 {
 		query = query.Where("is_effective = ?", isEffective)
 	}
-
-	// 分页查询
-	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
+	// 查询符合条件的总记录数
+	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// 查询符合条件的总记录数
-	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
+	// 分页查询
+	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -267,13 +266,13 @@ func (receiver GoodModel) GetMyGoods(isEffective int, page int, pageSize int, us
 	if isEffective != -1 {
 		query = query.Where("is_effective = ?", isEffective)
 	}
-	// 分页查询
-	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
+	// 查询符合条件的总记录数
+	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// 查询符合条件的总记录数
-	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
+	// 分页查询
+	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&goods).Error; err != nil {
 		return nil, 0, err
 	}
 

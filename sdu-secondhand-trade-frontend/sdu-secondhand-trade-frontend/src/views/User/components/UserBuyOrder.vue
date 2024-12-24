@@ -113,7 +113,7 @@ const submitRefundRequest =async () => {
     return;
   }
   const res = await sendAfterSaleAPI({
-    order_id : selectedOrder.id,
+    order_id : selectedOrder.value.id,
     problem: questionDescription.value,
   })
   if (res.code === 0) {

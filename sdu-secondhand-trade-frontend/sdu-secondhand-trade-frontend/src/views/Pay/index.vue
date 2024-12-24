@@ -11,7 +11,7 @@ const good = ref({})
 const route = useRoute()
 const router = useRouter()
 const getOderInfo = async () => {
-  const res = await getOrderAPI(route.params.id)
+  const res = await getOrderAPI(parseInt(route.params.id))
   orderInfo.value = res.data
 }
 
@@ -27,10 +27,10 @@ onMounted(async () => {
 })
 
 //支付宝
-const baseURL = 'http://127.0.0.1:5173/'//后端用于支付的服务器
+const baseURL = 'http://47.98.214.174:8081/'//后端用于支付的服务器
 const backURL = `http://127.0.0.1:5173/pay/callback/${route.params.id}`
 const redirectUrl = encodeURIComponent(backURL)
-const payUrl = `${baseURL}pay/aliPay?order_id=${route.params.id}&redirect=${redirectUrl}`
+const payUrl = `${baseURL}pay/alipay?order_id=${route.params.id}&redirect=${redirectUrl}`
 
 const countDown = useCountDown()
 
@@ -63,7 +63,7 @@ const startCountDown = () => {
         <div class="item">
           <p>支付平台</p>
           <a class="btn wx" href="javascript:;"></a>
-          <a class="btn alipay" :href="backURL"></a>
+          <a class="btn alipay" :href="payUrl"></a>
         </div>
         <div class="item">
           <p>支付方式</p>

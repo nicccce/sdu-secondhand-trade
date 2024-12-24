@@ -33,7 +33,7 @@ func (receiver ProblemService) CreateProblem(c *gin.Context) {
 
 type ProblemVO struct {
 	Total int             `json:"total"`
-	List  []model.Problem `json:"list"`
+	List  []model.Problem `json:"problems"`
 }
 
 func (receiver ProblemService) GetAllProblem(c *gin.Context) {
@@ -46,7 +46,7 @@ func (receiver ProblemService) GetAllProblem(c *gin.Context) {
 	}
 
 	var req ProblemReq
-	if err := c.ShouldBindQuery(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		aw.Error(err.Error())
 		return
 	}
@@ -75,7 +75,7 @@ func (receiver ProblemService) GetMyProblem(c *gin.Context) {
 	}
 
 	var req ProblemReq
-	if err := c.ShouldBindQuery(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		aw.Error(err.Error())
 		return
 	}

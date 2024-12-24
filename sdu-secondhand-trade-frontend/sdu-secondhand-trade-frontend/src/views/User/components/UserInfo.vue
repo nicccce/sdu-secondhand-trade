@@ -66,7 +66,7 @@ const submitAddress = async () => {
           message: '地址添加成功！'
         });
         // 更新地址列表
-        userStore.userInfo.addresses.push(dialogAddress.value);
+        userStore.refreshUserInfo()
         // 关闭对话框
         showAddressDialog.value = false;
       } else {
@@ -123,7 +123,7 @@ const onEditInfo = () => {
     student_id: userStore.userInfo.student_id,
     alipay: userStore.userInfo.alipay,
     gender: userStore.userInfo.gender,
-    campus: userStore.userInfo.campus,
+    campus: userStore.userInfo.campus||null,
     introduction: userStore.userInfo.introduction
   }
   isEditing.value = true
@@ -133,7 +133,7 @@ const saveChanges = () => {
   userForm.value.validate(async (valid) => {
     // 表单验证
     if (!valid) return
-    const res = await updateUserAPI()
+    const res = await updateUserAPI(editingUserInfo.value)
     if (res.code === 0) {
       userStore.refreshUserInfo()
       // 成功提示
@@ -264,7 +264,7 @@ const submitPasswordChange = async () => {
 
         <el-row>
           <el-col :span="12">
-            <el-form-item label="学号" prop="studentId">
+            <el-form-item label="学号" prop="student_id">
               <el-input v-model="editingUserInfo.student_id" disabled></el-input>
             </el-form-item>
           </el-col>

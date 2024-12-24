@@ -16,7 +16,7 @@ const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
 const getOderInfo = async () => {
-  const res = await getOrderAPI(route.params.id)
+  const res = await getOrderAPI(parseInt(route.params.id))
   orderInfo.value = res.data
 }
 
@@ -150,7 +150,7 @@ const submitNewAddress = async () => {
       message: '地址添加成功！'
     });
     // 更新地址列表
-    userStore.userInfo.addresses.push(newAddress.value);
+    userStore.refreshUserInfo()
     // 关闭对话框
     showAddAddressDialog.value = false;
   } else {

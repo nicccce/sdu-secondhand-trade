@@ -61,13 +61,12 @@ func (receiver ProblemModel) GetAllProblems(status int, page int, pageSize int) 
 		query = query.Where("status = ?", status)
 	}
 
-	// 分页查询
-	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&problems).Error; err != nil {
+	// 查询符合条件的总记录数
+	if err := query.Model(&Problem{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
-
-	// 查询符合条件的总记录数
-	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
+	// 分页查询
+	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&problems).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -86,13 +85,12 @@ func (receiver ProblemModel) GetMyProblem(status int, page int, pageSize int, us
 		query = query.Where("status = ?", status)
 	}
 
-	// 分页查询
-	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&problems).Error; err != nil {
+	// 查询符合条件的总记录数
+	if err := query.Model(&Problem{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
-
-	// 查询符合条件的总记录数
-	if err := query.Model(&Good{}).Count(&total).Error; err != nil {
+	// 分页查询
+	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&problems).Error; err != nil {
 		return nil, 0, err
 	}
 

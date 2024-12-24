@@ -32,6 +32,8 @@ const getProblemList = async () => {
     problemList.value = res.data.problems;
     total.value = res.data.total;
     for (let problem of problemList.value) {
+    console.log(problem);
+    
         const orderRes = await getOrderAPI(problem.order_id);
         problem.order = orderRes.data;
         const goodRes = await getGoodDetailAPI(problem.order.good_id);  // 获取商品详情
@@ -68,7 +70,7 @@ const updateRules = {
 const updateAfterSale = async () => {
     updateForm.value.validate(async (valid) => {
         if (!valid) return;
-        const res = await updateAfterSaleAPI(currentProblem.data);
+        const res = await updateAfterSaleAPI(currentProblem.value);
         if (res.code === 0) {
             ElMessage.success('售后信息已更新');
             dialogVisible.value = false; // 关闭弹窗
