@@ -19,6 +19,7 @@ import AdminUser from '@/views/User/components/AdminUser.vue'
 import AdminGood from '@/views/User/components/AdminGood.vue'
 import AdminAfterSale from '@/views/User/components/AdminAfterSale.vue'
 import About from '@/views/About/index.vue'
+import Search from '@/views/Search/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,6 +57,10 @@ const router = createRouter({
           path: 'pay/:id',
           name: 'pay',
           component: Pay
+        },
+        {
+          path: 'search/:name',
+          component: Search
         },
         {
           path: 'pay/callback/:id',

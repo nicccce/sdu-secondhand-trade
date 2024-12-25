@@ -28,7 +28,7 @@ onMounted(async () => {
 
 //支付宝
 const baseURL = 'http://47.98.214.174:8081/'//后端用于支付的服务器
-const backURL = `http://127.0.0.1:5173/pay/callback/${route.params.id}`
+const backURL = `http:/localhost:5173//pay/callback/${route.params.id}`
 const redirectUrl = encodeURIComponent(backURL)
 const payUrl = `${baseURL}pay/alipay?order_id=${route.params.id}&redirect=${redirectUrl}`
 

@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useCountDown } from '@/composables/useCountDown';
-import { registerAPI } from '@/apis/user';
+import { forgetAPI, registerAPI } from '@/apis/user';
 
 // 表单对象
 const form = ref({
@@ -194,7 +194,7 @@ const doForget = () => {
     formRef.value.validate(async (valid) => {
         if (valid) {
             try {
-                const res = await registerAPI({ student_id, password, phone, code })
+                const res = await forgetAPI({ student_id, password, phone, code })
                 if (res.code === 0) {
                     ElMessage({
                         type: 'success',

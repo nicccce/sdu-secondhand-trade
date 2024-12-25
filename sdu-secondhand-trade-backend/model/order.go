@@ -55,11 +55,10 @@ func (receiver *OrderModel) DeleteOrder(id int) error {
 func (receiver *OrderModel) GetOrdersByBuyerIDAndStatus(buyerID, status, page, pageSize int) ([]Order, int, error) {
 	var orders []Order
 	var total int64
-	offset := (page - 1) * pageSize // 计算偏移量
 
 	// 构建查询条件
 	query := receiver.Tx.Where("buyer_id = ? AND status = ?", buyerID, status).
-		Limit(pageSize).Offset(offset) // 设置分页条件
+		Offset((page - 1) * pageSize).Limit(pageSize) // 设置分页条件
 
 	// 查询符合条件的总订单数
 	if err := receiver.Tx.Model(&Order{}).Where("buyer_id = ? AND status = ?", buyerID, status).Count(&total).Error; err != nil {
@@ -77,11 +76,10 @@ func (receiver *OrderModel) GetOrdersByBuyerIDAndStatus(buyerID, status, page, p
 func (receiver *OrderModel) GetOrdersBySellerIDAndStatus(goodID, status, page, pageSize int) ([]Order, int, error) {
 	var orders []Order
 	var total int64
-	offset := (page - 1) * pageSize // 计算偏移量
 
 	// 构建查询条件
 	query := receiver.Tx.Where("good_id = ? AND status = ?", goodID, status).
-		Limit(pageSize).Offset(offset) // 设置分页条件
+		Offset((page - 1) * pageSize).Limit(pageSize) // 设置分页条件
 
 	// 查询符合条件的总订单数
 	if err := receiver.Tx.Model(&Order{}).Where("good_id = ? AND status = ?", goodID, status).Count(&total).Error; err != nil {
@@ -108,11 +106,10 @@ func (receiver *OrderModel) GetOrderByGoodID(id int) (*Order, error) {
 func (receiver *OrderModel) GetOrdersByBuyerID(buyerID, page, pageSize int) ([]Order, int, error) {
 	var orders []Order
 	var total int64
-	offset := (page - 1) * pageSize // 计算偏移量
 
 	// 构建查询条件
 	query := receiver.Tx.Where("buyer_id = ? ", buyerID).
-		Limit(pageSize).Offset(offset) // 设置分页条件
+		Offset((page - 1) * pageSize).Limit(pageSize) // 设置分页条件
 
 	// 查询符合条件的总订单数
 	if err := receiver.Tx.Model(&Order{}).Where("buyer_id = ?", buyerID).Count(&total).Error; err != nil {
@@ -130,11 +127,10 @@ func (receiver *OrderModel) GetOrdersByBuyerID(buyerID, page, pageSize int) ([]O
 func (receiver *OrderModel) GetOrdersByGoodID(goodID, page, pageSize int) ([]Order, int, error) {
 	var orders []Order
 	var total int64
-	offset := (page - 1) * pageSize // 计算偏移量
 
 	// 构建查询条件
 	query := receiver.Tx.Where("good_id = ? ", goodID).
-		Limit(pageSize).Offset(offset) // 设置分页条件
+		Offset((page - 1) * pageSize).Limit(pageSize) // 设置分页条件
 
 	// 查询符合条件的总订单数
 	if err := receiver.Tx.Model(&Order{}).Where("good_id = ? ", goodID).Count(&total).Error; err != nil {

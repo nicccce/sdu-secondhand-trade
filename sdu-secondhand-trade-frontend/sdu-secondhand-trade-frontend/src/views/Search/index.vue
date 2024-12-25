@@ -2,7 +2,7 @@
 import { getSubCategoryAPI } from '@/apis/category';
 import { useCategoryStore } from '@/stores/category';
 import { computed, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import GoodItem from '../Category/components/GoodItem.vue';
 import { searchGoodAPI } from '../../apis/good';
 
@@ -10,9 +10,15 @@ const route = useRoute();
 //获取商品数据
 const goodList = ref([])
 const getGoodList = async () => {
-    let res = await searchGoodAPI(route.params.name)
+    const res = await searchGoodAPI(route.params.name)
     goodList.value = res.data
 }
+
+onBeforeRouteUpdate(async (to) => {
+    // 获取当前路由对应的分类数据
+    const res = await searchGoodAPI(to.params.name)
+    goodList.value = res.data
+});
 
 onMounted(() => {
     getGoodList()
@@ -21,7 +27,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="container" v-if="categoryData.id">
+    <div class="container" v-if="goodList.length">
         <!-- 面包屑 -->
         <div class="bread-container">
             <el-breadcrumb separator=">">

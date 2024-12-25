@@ -11,7 +11,7 @@ const handleSearch = ()=>{
   if(search.value === ""){
     return
   }
-  router.push({path : `/good/search/${search.value}`})
+  router.push({path : `/search/${search.value}`})
 }
 
 </script>
