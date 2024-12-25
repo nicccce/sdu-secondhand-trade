@@ -13,7 +13,7 @@ type Good struct {
 	Brand             string    `json:"brand"`
 	Status            string    `json:"status"`
 	FullName          string    `json:"full_name"`
-	Specification     string    `json:"specification"`
+	Specification     string    `json:"specifications"`
 	TransactionMethod int       `json:"transaction_method"`
 	Detail            string    `json:"detail"`
 	CreatedAt         time.Time `json:"created_at" binging:"-"`
@@ -277,4 +277,26 @@ func (receiver GoodModel) GetMyGoods(isEffective int, page int, pageSize int, us
 	}
 
 	return goods, int(total), nil
+}
+
+func (receiver GoodModel) GetSearchGoods(search string) ([]Good, error) {
+	var goods []Good
+
+	// 构建查询条件
+	query := receiver.Tx
+	if search != "" {
+		// 模糊查询所有字段
+		query = query.Where(
+			"full_name LIKE ? OR brand LIKE ? OR status LIKE ? OR specification LIKE ? OR detail LIKE ? OR name LIKE ? OR description LIKE ?",
+			"%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%",
+		)
+	}
+
+	query = query.Where("is_effective = ?", true)
+
+	if err := query.Find(&goods).Error; err != nil {
+		return nil, err
+	}
+
+	return goods, nil
 }
