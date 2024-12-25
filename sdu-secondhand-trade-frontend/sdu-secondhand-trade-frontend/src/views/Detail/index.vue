@@ -16,7 +16,6 @@ const getGood = async () => {
     showErrorMessage()
   }
 }
-
 const staticStore = useStaticStore();
 const categoryStore = useCategoryStore();
 
@@ -164,7 +163,8 @@ const buy = async () => {
                     </li>
                     <li>
                       <span class="dt">校区</span>
-                      <span class="dd">{{ good.campus }}</span>
+                      <span class="dd">{{ (staticStore.campusList.find(campus => campus.id === good.campus) ||
+                { name: '校外' }).name }}校区</span>
                     </li>
                   </ul>
                   <div class="detail">

@@ -241,10 +241,10 @@ onMounted(()=>{
                                         :formatter="formatPrice" :parser="parsePrice" />
                                 </el-form-item>
                                 <el-form-item label="状态" prop="brand">
-                                    <el-input v-model="good.brand" placeholder="请输入价格（如：9成新）" clearable />
+                                    <el-input v-model="good.brand" placeholder="请输入商品状态（如：9成新）" clearable />
                                 </el-form-item>
                                 <el-form-item label="品牌" prop="status">
-                                    <el-input v-model="good.status" placeholder="请输入价格" clearable />
+                                    <el-input v-model="good.status" placeholder="请输入品牌" clearable />
                                 </el-form-item>
                                 <el-form-item label="分类" prop="category">
                                     <el-cascader :options="categoryOption" v-model="good.category"

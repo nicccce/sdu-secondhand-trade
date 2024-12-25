@@ -123,7 +123,7 @@ const onEditInfo = () => {
     student_id: userStore.userInfo.student_id,
     alipay: userStore.userInfo.alipay,
     gender: userStore.userInfo.gender,
-    campus: userStore.userInfo.campus||null,
+    campus: userStore.userInfo.campus || null,
     introduction: userStore.userInfo.introduction
   }
   isEditing.value = true
@@ -213,6 +213,27 @@ const submitPasswordChange = async () => {
     }
   });
 };
+
+
+const imageUrl = ref(userStore.userInfo.cover)
+
+const handleAvatarSuccess = (response, uploadFile) => {
+  imageUrl.value = URL.createObjectURL(uploadFile.raw)
+}
+
+const beforeAvatarUpload = (rawFile) => {
+  // 校验上传文件的格式，支持 JPEG, PNG 和 GIF 格式
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  if (!allowedTypes.includes(rawFile.type)) {
+    ElMessage.error('图片格式不合法!');
+    return false;  // 阻止文件上传
+  } else if (rawFile.size / 1024 / 1024 > 5) {
+    ElMessage.error('图片大小不得超过 5MB!');
+    return false;  // 阻止文件上传
+  }
+  imageUrl.value = URL.createObjectURL(rawFile)
+  return true;  // 允许文件上传
+};
 </script>
 
 <template>
@@ -220,7 +241,11 @@ const submitPasswordChange = async () => {
     <!-- 用户信息 -->
     <div class="user-meta">
       <div class="avatar">
-        <img src="https://www.bkjx.sdu.edu.cn/dfiles/17838/css/style1/images/jsfw.jpg" />
+        <el-upload class="avatar-uploader" action="" :show-file-list="false" :on-success="handleAvatarSuccess"
+          :before-upload="beforeAvatarUpload">
+          <img v-if="imageUrl" :src="imageUrl"  />
+          <img v-else src="https://www.bkjx.sdu.edu.cn/dfiles/17838/css/style1/images/jsfw.jpg" />
+        </el-upload>
       </div>
       <h4>{{ userStore.userInfo.nickname }}</h4>
     </div>

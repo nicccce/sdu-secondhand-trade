@@ -48,7 +48,7 @@ const sortFieldList=['time','campus']
 // tab切换
 const tabChange = (tabId) => {
   reqData.value.sort_field = tabId
-  reqData.page = 1
+  reqData.value.page = 1
   getGoodList()
 }
 
