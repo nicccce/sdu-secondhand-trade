@@ -1,0 +1,41 @@
+services:
+  # MySQL 服务配置
+  mysql:
+    image: mysql:latest
+    container_name: ${CONTAINER_NAME}  # 容器名称
+    hostname: ${HOSTNAME}  # 主机名
+    environment:
+      LANG: ${LANG}  # 设定语言环境
+      TZ: ${TZ}  # 设定时区
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # MySQL root 用户的密码
+      # 只在需要时启用以下变量
+      # MYSQL_DATABASE: ${MYSQL_DATABASE}  # MySQL 数据库名称
+      # MYSQL_USER: ${MYSQL_USER}  # MySQL 用户名
+      # MYSQL_PASSWORD: ${MYSQL_PASSWORD}  # MySQL 密码
+    ports:
+      - "${MYSQL_PORT}:3306"  # 将容器的 3306 端口映射到主机上的指定端口
+    volumes:
+      # MySQL 的初始化脚本
+      - ${MYSQL_INIT}:/docker-entrypoint-initdb.d/init.sql
+      # 持久化映射
+      # - ${MYSQL_DATA}:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT}  # 设定内存限制
+
+  # 应用程序服务配置
+  app:
+    build: .  # 构建镜像的路径
+    restart: "always"  # 总是重新启动容器
+    command: ["./app"]  # 运行的命令
+    depends_on:
+      - mysql  # 依赖于 mysql 服务
+    ports:
+      - 8001:8080  # 将容器的 8080 端口映射到主机的 8001 端口
+    volumes:
+      - /home/eva-02/training-frontend-frontend/uploads:/uploads
+
+    # 设置国内镜像网站
+    environment:
+      - DOCKER_REGISTRY_MIRROR=https://hub.uuuadc.top/

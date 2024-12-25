@@ -5,3 +5,8 @@ jwtSecret: "your-jwt-secret"
 port: cnm
 
 uploadDir:
+
+# 支付宝沙箱配置
+kAppId:
+kPrivateKey:
+kServerDomain:
